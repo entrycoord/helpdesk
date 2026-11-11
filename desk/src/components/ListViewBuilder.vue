@@ -65,7 +65,7 @@
       <ListHeaderItem
         v-for="column in columns"
         :key="column.key"
-        :item="column"
+        :item="{ ...column, label: __(column.label) }"
         @columnWidthUpdated="handleColumnResize"
       />
     </ListHeader>
@@ -548,6 +548,10 @@ const quickFilters = createResource({
   },
 });
 
+// Option names of Select/Link fields that hold a fixed vocabulary
+// (status, priority, ticket type), so a site translation can cover them.
+const TRANSLATED_VALUE_KEYS = ["status", "priority", "ticket_type"];
+
 function listCell(column: any, row: any, item: any, idx: number) {
   const columnConfig = options.value.columnConfig;
   if (columnConfig && columnConfig[column.key]?.custom) {
@@ -580,7 +584,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   return h("span", {
     class: "truncate flex-1",
-    textContent: item,
+    textContent: TRANSLATED_VALUE_KEYS.includes(column.key) ? __(item) : item,
   });
 }
 

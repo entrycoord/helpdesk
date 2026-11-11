@@ -20,7 +20,7 @@ import "./index.css";
 import { router } from "./router";
 import { telemetryPlugin } from "@framework/ui";
 import { isCustomerPortal } from "@/utils";
-import { translationPlugin } from "./translation";
+import { loadTranslations, translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";
 import { initSocket } from "./socket";
 
@@ -95,10 +95,10 @@ if (import.meta.env.DEV) {
     if (window.lang) document.documentElement.lang = window.lang;
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
-    app.mount("#app");
+    loadTranslations().finally(() => app.mount("#app"));
   });
 } else {
   socket = initSocket();
   app.config.globalProperties.$socket = socket;
-  app.mount("#app");
+  loadTranslations().finally(() => app.mount("#app"));
 }

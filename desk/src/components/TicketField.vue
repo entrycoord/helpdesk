@@ -25,6 +25,7 @@
 import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
+import { PRIORITY_DISPLAY_ORDER } from "@/stores/ticketPriority";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
 import {
@@ -97,8 +98,31 @@ const isSearchableSelect = computed(
 // the Combobox feeds one placeholder to both trigger and search box, so it
 // gets none and its prefix slot carries the empty state instead
 const emptyLabel = computed(
-  () => props.field.placeholder || `Add ${props.field.label}`
+  () => props.field.placeholder || __("Add {0}", [props.field.label])
 );
+
+// Link doctypes whose record names are translated for display
+const TRANSLATED_LINKS = ["HD Ticket Type", "HD Ticket Priority"];
+
+const translatedLinkOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: props.field.options,
+    fields: ["name"],
+    filters: { disabled: 0 },
+    limit_page_length: 100,
+    order_by: "name asc",
+  },
+  auto: TRANSLATED_LINKS.includes(props.field.options),
+  transform: (rows: { name: string }[]): Option[] =>
+    rows
+      .map((row) => ({ label: __(row.name), value: row.name }))
+      .sort(
+        (a, b) =>
+          (PRIORITY_DISPLAY_ORDER[a.value] ?? 99) -
+          (PRIORITY_DISPLAY_ORDER[b.value] ?? 99)
+      ),
+});
 
 const usesCombobox = computed(
   () => !!props.field.url_method || isSearchableSelect.value
@@ -157,22 +181,34 @@ const component = computed(() => {
       class: "!w-full !bg-surface-base !border-transparent !text-base",
       onRedirect: handleRedirect,
     };
-    // item-prefix drives both the options and the control, so one slot puts
-    // the level icon everywhere
-    if (props.field.options === "HD Ticket Priority") {
-      return h(Link, linkProps, {
-        "item-prefix": ({ item }: { item: { value: string } }) =>
-          h(TicketPriority, { priority: item.value, iconOnly: true }),
-        // typing can drop the committed value from the options, so the
-        // control falls back here; keep its icon until it changes
-        prefix: () =>
-          props.value
-            ? h(TicketPriority, {
-                priority: String(props.value),
-                iconOnly: true,
-              })
-            : null,
-      });
+    // Priority and type names are site vocabulary, so they are listed here
+    // with translated labels; the generic Link only shows the raw names.
+    if (TRANSLATED_LINKS.includes(props.field.options)) {
+      const isPriority = props.field.options === "HD Ticket Priority";
+      return h(
+        Combobox,
+        {
+          class: linkProps.class,
+          options: withSavedValue(translatedLinkOptions.data || []),
+        },
+        // item-prefix drives both the options and the control, so one slot
+        // puts the level icon everywhere
+        isPriority
+          ? {
+              "item-prefix": ({ item }: { item: { value: string } }) =>
+                h(TicketPriority, { priority: item.value, iconOnly: true }),
+              // typing can drop the committed value from the options, so the
+              // control falls back here; keep its icon until it changes
+              prefix: () =>
+                props.value
+                  ? h(TicketPriority, {
+                      priority: String(props.value),
+                      iconOnly: true,
+                    })
+                  : null,
+            }
+          : undefined
+      );
     }
     return h(Link, linkProps);
   } else if (props.field.fieldtype === "Select") {
@@ -181,8 +217,8 @@ const component = computed(() => {
       : select(selectOptions.value);
   } else if (props.field.fieldtype === "Check") {
     return select([
-      { label: "Yes", value: 1 },
-      { label: "No", value: 0 },
+      { label: __("Yes"), value: 1 },
+      { label: __("No"), value: 0 },
     ]);
   } else if (textFields.includes(props.field.fieldtype)) {
     return textInput();
@@ -326,8 +362,10 @@ function handleRedirect(value: string) {
 
 :deep(button.form-control[data-slot="trigger"]:hover .lucide-chevron-down),
 :deep(button.form-control[data-slot="trigger"]:focus .lucide-chevron-down),
-:deep(button.form-control[data-slot="trigger"][data-state="open"]
-    .lucide-chevron-down) {
+:deep(
+    button.form-control[data-slot="trigger"][data-state="open"]
+      .lucide-chevron-down
+  ) {
   visibility: visible;
 }
 :deep(.form-control [type="checkbox"]) {

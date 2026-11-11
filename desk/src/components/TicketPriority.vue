@@ -56,8 +56,8 @@
         />
       </svg>
     </span>
-    <span v-if="!iconOnly" :title="priority" class="truncate">{{
-      priority
+    <span v-if="!iconOnly" :title="__(priority)" class="truncate">{{
+      __(priority)
     }}</span>
   </span>
 </template>
