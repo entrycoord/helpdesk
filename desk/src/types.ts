@@ -331,7 +331,8 @@ export type TicketTab =
   | "comment"
   | "details"
   | "call"
-  | "analytics";
+  | "analytics"
+  | "maintainer-notes";
 
 export interface TabObject {
   value: TicketTab;

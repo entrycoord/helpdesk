@@ -171,6 +171,10 @@
                 />
               </div>
 
+              <MaintainerNotes
+                v-else-if="tab.value === 'maintainer-notes'"
+                :ticket-id="String(ticket.doc?.name)"
+              />
               <!-- Rest Activities -->
               <TicketTimeline
                 v-else
@@ -246,6 +250,7 @@
 <script setup lang="ts">
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideLock from "~icons/lucide/lock";
 import { __ } from "@/translation";
 import {
   Breadcrumbs,
@@ -284,6 +289,7 @@ import {
 } from "@/components/icons";
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
+import MaintainerNotes from "@/components/ticket-agent/maintainer-notes/MaintainerNotes.vue";
 
 import CustomActions from "@/components/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";
@@ -302,6 +308,7 @@ import {
   revalidateTicket,
   useTicket,
 } from "@/composables/useTicket";
+import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { getMeta } from "@/stores/meta";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -322,6 +329,7 @@ import { useRouter } from "vue-router";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const authStore = useAuthStore();
 
 const ticketStatusStore = useTicketStatusStore();
 const router = useRouter();
@@ -517,7 +525,7 @@ const dropdownOptions = computed(() =>
 );
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
-  const _tabs = [
+  const _tabs: TabObject[] = [
     {
       value: "details",
       label: __("Details"),
@@ -540,6 +548,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       iconLeft: CommentIcon,
     },
   ];
+
+  // pushed only for maintainers: the tab manager reads this full list, not
+  // visibleTabs, so a condition alone would still let #maintainer-notes win
+  if (authStore.isMaintainer) {
+    _tabs.push({
+      value: "maintainer-notes",
+      label: __("Maintainer notes"),
+      iconLeft: LucideLock,
+      condition: () => authStore.isMaintainer,
+    });
+  }
 
   if (isCallingEnabled.value) {
     _tabs.push({

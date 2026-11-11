@@ -11,6 +11,14 @@
     "
   >
     <template #default="{ isEmpty }">
+      <!-- maintainers also have a private notes tab; this one is shared -->
+      <div
+        v-if="editable && authStore.isMaintainer"
+        class="mx-5 flex items-center gap-1.5 py-1.5 text-sm text-ink-gray-5"
+      >
+        <LucideUsers class="size-3.5 shrink-0" />
+        {{ __("Client staff can see comments") }}
+      </div>
       <!-- Scroll here so selected nodes aren't clipped. -->
       <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
         <EditorContent
@@ -131,6 +139,7 @@ import {
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
+import LucideUsers from "~icons/lucide/users";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());

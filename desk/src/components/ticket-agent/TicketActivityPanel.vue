@@ -26,6 +26,11 @@
       class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
     >
       <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
+      <MaintainerNotes
+        v-else-if="tab.value === 'maintainer-notes'"
+        :key="String(ticket.doc?.name)"
+        :ticket-id="String(ticket.doc?.name)"
+      />
       <TicketTimeline
         v-else
         :ticket-id="String(ticket.doc?.name)"
@@ -56,15 +61,18 @@ import {
   PhoneIcon,
 } from "@/components/icons";
 import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
+import MaintainerNotes from "@/components/ticket-agent/maintainer-notes/MaintainerNotes.vue";
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { reloadTicketFeed } from "@/composables/useTicket";
+import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { TabObject, TicketSymbol } from "@/types";
 import { TabList, TabPanel, TabTrigger, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import LucideChartNoAxesColumn from "~icons/lucide/chart-no-axes-column";
+import LucideLock from "~icons/lucide/lock";
 import TicketTimeline from "./timeline/TicketTimeline.vue";
 
 const ticket = inject(TicketSymbol)!;
@@ -74,6 +82,7 @@ const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
 );
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const authStore = useAuthStore();
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
@@ -93,6 +102,16 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       iconLeft: CommentIcon,
     },
   ];
+
+  // absent, not hidden, for everyone else: the tab manager only activates a
+  // listed tab, so a #maintainer-notes link falls back to the first one
+  if (authStore.isMaintainer) {
+    _tabs.push({
+      value: "maintainer-notes",
+      label: __("Maintainer notes"),
+      iconLeft: LucideLock,
+    });
+  }
 
   if (isCallingEnabled.value) {
     _tabs.push({

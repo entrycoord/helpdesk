@@ -42,6 +42,9 @@ export const useNotificationStore = defineStore("notification", () => {
       name: "TicketAgent",
       params: { ticketId: n.document_name },
     };
+    // a mention in a maintainer note opens the notes tab
+    if (n.source_doctype === "HD Maintainer Note")
+      return { ...route, hash: "#maintainer-notes" };
     if (n.source_doctype !== "Comment" || !n.source_name) return route;
     return {
       ...route,
