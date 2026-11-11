@@ -2,6 +2,7 @@ import frappe
 
 from helpdesk.utils import agent_only, get_agent_name, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
+from helpdesk.utils import is_maintainer
 
 
 @frappe.whitelist()
@@ -60,6 +61,7 @@ def get_user():
         "has_agent_record": has_agent_record,
         "user_id": user_id,
         "is_manager": is_manager,
+        "is_maintainer": is_maintainer(current_user),
         "user_image": user_image,
         "user_first_name": user_first_name,
         "user_name": user_name,

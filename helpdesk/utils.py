@@ -191,6 +191,22 @@ def agent_only(fn):
     return wrapper
 
 
+def is_maintainer(user: str | None = None) -> bool:
+    """
+    Check whether `user` is a maintainer: an agent who also holds the
+    maintainer role. Only maintainers read maintainer notes.
+
+    :param user: User to check against, defaults to current user
+    :return: Whether `user` is a maintainer
+    """
+    from helpdesk.consts import MAINTAINER_ROLE
+
+    user = user or frappe.session.user
+    if is_admin(user):
+        return True
+    return MAINTAINER_ROLE in frappe.get_roles(user) and is_agent(user)
+
+
 def is_agent_manager(user: str | None = None) -> bool:
     """
     Check whether `user` may manage other agents

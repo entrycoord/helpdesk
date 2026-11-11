@@ -198,6 +198,15 @@ def merge_ticket(source: str, target: str):
     )
     duplicate_list_retain_timestamp("File", source_attachments, target, controller)
 
+    # maintainer notes move rather than copy, keeping their timestamps
+    frappe.db.set_value(
+        "HD Maintainer Note",
+        {"ticket": source},
+        "ticket",
+        target,
+        update_modified=False,
+    )
+
     doc = frappe.get_doc("HD Ticket", source)
 
     doc.status = "Closed"

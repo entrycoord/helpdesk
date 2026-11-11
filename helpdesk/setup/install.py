@@ -10,6 +10,7 @@ from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
+from .maintainer import create_maintainer_role
 from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
@@ -37,6 +38,7 @@ def after_install():
     add_property_setters()
     add_website_settings_permission()
     add_default_views()
+    create_maintainer_role()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 

@@ -46,3 +46,6 @@ CUSTOMER_ALWAYS_WRITABLE_FIELDS = (
 
 # shown on the agent details tab from meta, whether or not the template lists them
 CORE_TICKET_FIELDS = ("priority", "ticket_type", "customer", "agent_group")
+
+# maintainers: the outside team that runs the site; private notes on tickets
+MAINTAINER_ROLE = "Helpdesk Maintainer"
