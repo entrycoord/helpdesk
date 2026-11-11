@@ -98,7 +98,7 @@ const isSearchableSelect = computed(
 // the Combobox feeds one placeholder to both trigger and search box, so it
 // gets none and its prefix slot carries the empty state instead
 const emptyLabel = computed(
-  () => props.field.placeholder || __("Add {0}", [props.field.label])
+  () => props.field.placeholder || __("Add {0}", [__(props.field.label)])
 );
 
 // Link doctypes whose record names are translated for display
