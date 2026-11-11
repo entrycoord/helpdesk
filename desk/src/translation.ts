@@ -40,19 +40,19 @@ export const __ = translate;
 function applyRelativeTimeLocale() {
   dayjs.updateLocale("en", {
     relativeTime: {
-      future: translate("in %s"),
-      past: translate("%s ago"),
-      s: translate("a few seconds"),
-      m: translate("a minute"),
-      mm: translate("%d minutes"),
-      h: translate("an hour"),
-      hh: translate("%d hours"),
-      d: translate("a day"),
-      dd: translate("%d days"),
-      M: translate("a month"),
-      MM: translate("%d months"),
-      y: translate("a year"),
-      yy: translate("%d years"),
+      future: __("in %s"),
+      past: __("%s ago"),
+      s: __("a few seconds"),
+      m: __("a minute"),
+      mm: __("%d minutes"),
+      h: __("an hour"),
+      hh: __("%d hours"),
+      d: __("a day"),
+      dd: __("%d days"),
+      M: __("a month"),
+      MM: __("%d months"),
+      y: __("a year"),
+      yy: __("%d years"),
     },
   });
 }
