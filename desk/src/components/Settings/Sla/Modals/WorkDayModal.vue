@@ -16,31 +16,31 @@
             v-model="workDayData.workday"
             :options="[
               {
-                label: 'Monday',
+                label: __('Monday'),
                 value: 'Monday',
               },
               {
-                label: 'Tuesday',
+                label: __('Tuesday'),
                 value: 'Tuesday',
               },
               {
-                label: 'Wednesday',
+                label: __('Wednesday'),
                 value: 'Wednesday',
               },
               {
-                label: 'Thursday',
+                label: __('Thursday'),
                 value: 'Thursday',
               },
               {
-                label: 'Friday',
+                label: __('Friday'),
                 value: 'Friday',
               },
               {
-                label: 'Saturday',
+                label: __('Saturday'),
                 value: 'Saturday',
               },
               {
-                label: 'Sunday',
+                label: __('Sunday'),
                 value: 'Sunday',
               },
             ]"
@@ -161,7 +161,12 @@ type WorkDayRow = Partial<
   >
 >;
 
-const TIME_FIELDS = ["start_time", "end_time", "break_start", "break_end"] as const;
+const TIME_FIELDS = [
+  "start_time",
+  "end_time",
+  "break_start",
+  "break_end",
+] as const;
 const DEFAULT_BREAK_MINUTES = 60;
 const MINUTES_IN_DAY = 24 * 60;
 
@@ -244,7 +249,8 @@ function validateField(field: keyof typeof errors & keyof typeof workDayData) {
 
 function validateTimeRange() {
   if (!workDayData.start_time || !workDayData.end_time) {
-    if (!workDayData.start_time) errors.start_time = __("Start time is required");
+    if (!workDayData.start_time)
+      errors.start_time = __("Start time is required");
     if (!workDayData.end_time) errors.end_time = __("End time is required");
     return false;
   }
@@ -264,9 +270,15 @@ function validateBreak() {
 /** End a newly picked break an hour later, within the working hours. */
 function setDefaultBreakEnd(breakStart: string) {
   if (!breakStart) return;
-  const dayEnd = workDayData.end_time ? toMinutes(workDayData.end_time) : MINUTES_IN_DAY - 1;
-  const breakEnd = Math.floor(Math.min(toMinutes(breakStart) + DEFAULT_BREAK_MINUTES, dayEnd));
-  workDayData.break_end = formatTimeToHHMMSS(`${Math.floor(breakEnd / 60)}:${breakEnd % 60}`);
+  const dayEnd = workDayData.end_time
+    ? toMinutes(workDayData.end_time)
+    : MINUTES_IN_DAY - 1;
+  const breakEnd = Math.floor(
+    Math.min(toMinutes(breakStart) + DEFAULT_BREAK_MINUTES, dayEnd)
+  );
+  workDayData.break_end = formatTimeToHHMMSS(
+    `${Math.floor(breakEnd / 60)}:${breakEnd % 60}`
+  );
 }
 
 function removeBreak() {
@@ -309,7 +321,8 @@ function getRow(loaded: WorkDayRow = {}): WorkDayRow {
   const row: WorkDayRow = { workday: workDayData.workday };
   for (const field of TIME_FIELDS) {
     const time = formatTimeToHHMMSS(workDayData[field]);
-    row[field] = time === formatTimeToHHMMSS(loaded[field]) ? loaded[field] : time;
+    row[field] =
+      time === formatTimeToHHMMSS(loaded[field]) ? loaded[field] : time;
   }
   return row;
 }
@@ -320,7 +333,11 @@ function applyBreakToOtherDays(row: WorkDayRow) {
   let applied = 1;
   for (const day of props.workDaysList) {
     if (day.workday === row.workday) continue;
-    const withBreak = { ...day, break_start: row.break_start, break_end: row.break_end };
+    const withBreak = {
+      ...day,
+      break_start: row.break_start,
+      break_end: row.break_end,
+    };
     if (getBreakError(withBreak)) {
       skipped.push(day.workday);
       continue;
@@ -337,7 +354,9 @@ function toastAppliedBreak(applied: number, skipped: string[]) {
       ? __("Break applied to 1 workday.")
       : __("Break applied to {0} workdays.", [String(applied)]);
   if (!skipped.length) return toast.success(message);
-  const skippedMessage = __("Skipped {0}: outside working hours.", [skipped.join(", ")]);
+  const skippedMessage = __("Skipped {0}: outside working hours.", [
+    skipped.join(", "),
+  ]);
   toast.warning(`${message} ${skippedMessage}`);
 }
 
@@ -363,18 +382,29 @@ function loadForm(data: WorkDayRow) {
 
 function resetForm() {
   loadForm({});
-  Object.assign(errors, { workday: "", start_time: "", end_time: "", break: "" });
+  Object.assign(errors, {
+    workday: "",
+    start_time: "",
+    end_time: "",
+    break: "",
+  });
   applyBreakToAll.value = false;
   isConfirmingDelete.value = false;
 }
 
 function formatTimeToHHMMSS(time?: string | null) {
   const parts = (time || "").split(":");
-  if (parts.length < 2 || parts.length > 3 || !parts.every((part) => /^\d{1,2}$/.test(part))) {
+  if (
+    parts.length < 2 ||
+    parts.length > 3 ||
+    !parts.every((part) => /^\d{1,2}$/.test(part))
+  ) {
     return "";
   }
   const [hours, minutes, seconds = "00"] = parts;
-  return [hours, minutes, seconds].map((part) => part.padStart(2, "0")).join(":");
+  return [hours, minutes, seconds]
+    .map((part) => part.padStart(2, "0"))
+    .join(":");
 }
 
 // Re-check a shown break error as the times change, so a fixed break clears it.
@@ -392,7 +422,8 @@ watch(
   () => dialog.value.show,
   (isOpen) => {
     if (!isOpen) return;
-    if (dialog.value.isEditing && dialog.value.data) loadForm(dialog.value.data);
+    if (dialog.value.isEditing && dialog.value.data)
+      loadForm(dialog.value.data);
     else resetForm();
   }
 );

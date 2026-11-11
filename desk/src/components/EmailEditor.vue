@@ -191,7 +191,7 @@
             <EditorTableMenu />
           </div>
           <div class="flex shrink-0 items-center justify-end gap-x-2">
-            <Button label="Discard" @click="handleDiscard" />
+            <Button :label="__('Discard')" @click="handleDiscard" />
             <!-- A disabled button fires no pointer events, so the span
                  carries the hover for the tooltip -->
             <Tooltip
@@ -286,7 +286,7 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: "Send",
+    default: () => __("Send"),
   },
   editable: {
     type: Boolean,
@@ -512,7 +512,9 @@ const sendMail = createResource({
   debounce: 300,
 });
 
-const label = computed(() => (sendMail.loading ? "Sending..." : props.label));
+const label = computed(() =>
+  sendMail.loading ? __("Sending...") : props.label
+);
 
 const isDisabled = computed(
   () =>
@@ -533,7 +535,9 @@ function submitMail() {
     !bccEmailsClone.value.length
   ) {
     toast.warning(
-      "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+      __(
+        "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+      )
     );
     return false;
   }

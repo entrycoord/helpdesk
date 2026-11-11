@@ -118,6 +118,7 @@ import {
   validateAssignmentRule,
 } from "@/stores/assignmentRules";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
 import {
   Avatar,
   Badge,
@@ -132,16 +133,16 @@ import AssigneeSearch from "./AssigneeSearch.vue";
 
 const { getUser } = useUserStore();
 
-const ticketRoutingOptions = [
+const ticketRoutingOptions = computed(() => [
   {
-    label: "Auto-rotate",
+    label: __("Auto-rotate"),
     value: "Round Robin",
   },
   {
-    label: "Assign by workload",
+    label: __("Assign by workload"),
     value: "Load Balancing",
   },
-];
+]);
 
 const removeAssignedUser = (user) => {
   assignmentRuleData.value.users = assignmentRuleData.value.users.filter(

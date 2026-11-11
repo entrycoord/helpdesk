@@ -58,7 +58,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No contacts found",
+      title: __("No contacts found"),
       icon: h(LucideContact2, {
         class: "h-10 w-10",
       }),
@@ -77,7 +77,7 @@ const options = computed(() => {
 
 usePageMeta(() => {
   return {
-    title: "Contacts",
+    title: __("Contacts"),
   };
 });
 </script>

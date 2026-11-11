@@ -4,7 +4,7 @@
       :to="{ name: routeName }"
       class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
-      {{ isMobileView ? "..." : label }}
+      {{ isMobileView ? "..." : __(label) }}
     </router-link>
     <span class="ms-0.5 me-1 text-base text-ink-gray-4" aria-hidden="true">
       /
@@ -13,7 +13,7 @@
       <template #default="{ open }">
         <Button variant="ghost" class="max-w-[200px] sm:max-w-none">
           <span class="text-lg-medium text-nowrap truncate">{{
-            currentView.label
+            __(currentView.label)
           }}</span>
           <template #prefix>
             <component
@@ -41,12 +41,12 @@
 
       <template #item-label="{ item }">
         <div class="flex items-center min-w-0 max-w-[50vw]">
-          <span class="truncate">{{ item.label }}</span>
+          <span class="truncate">{{ __(item.label) }}</span>
           <Badge
             v-if="item.is_standard"
             class="ms-1 flex-shrink-0"
             size="sm"
-            label="Standard"
+            :label="__('Standard')"
           />
         </div>
       </template>

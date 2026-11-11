@@ -1,25 +1,23 @@
+import { __ } from "@/translation";
+
 export const getRepetitionText = (repetition: any) => {
-  const parts: string[] = [];
+  if (repetition.all) return __("Every week");
 
-  if (repetition.all) {
-    parts.push("week");
-  } else {
-    if (repetition.first) parts.push("first");
-    if (repetition.second) parts.push("second");
-    if (repetition.third) parts.push("third");
-    if (repetition.fourth) parts.push("fourth");
-    if (repetition.fifth) parts.push("fifth");
+  const ordinals: string[] = [];
+  if (repetition.first) ordinals.push(__("first"));
+  if (repetition.second) ordinals.push(__("second"));
+  if (repetition.third) ordinals.push(__("third"));
+  if (repetition.fourth) ordinals.push(__("fourth"));
+  if (repetition.fifth) ordinals.push(__("fifth"));
 
-    if (parts.length === 0) return "";
+  if (ordinals.length === 0) return "";
 
-    if (parts.length > 1) {
-      const last = parts.pop();
-      parts[parts.length - 1] = `${parts[parts.length - 1]} and ${last}`;
-    }
-
-    parts[0] = parts[0].charAt(0) + parts[0].slice(1);
-    return `Every ${parts.join(", ")} week`;
+  let list = ordinals[0];
+  if (ordinals.length > 1) {
+    const last = ordinals[ordinals.length - 1];
+    const head = ordinals.slice(0, -1).join(", ");
+    list = __("{0} and {1}", [head, last]);
   }
 
-  return parts[0] ? `Every ${parts[0]}` : "";
+  return __("Every {0} week", [list]);
 };

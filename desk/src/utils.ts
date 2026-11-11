@@ -2,12 +2,7 @@ import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
-import {
-  call,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-} from "frappe-ui";
+import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
@@ -305,7 +300,10 @@ export function copyActivityLink(
 }
 
 export const ClearFormattingUtility = {
-  label: "Clear formatting",
+  // a getter: the dictionary is not loaded yet when this module is imported
+  get label() {
+    return __("Clear formatting");
+  },
   icon: LucideBrushCleaning,
   action: (editor) => {
     editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
@@ -414,13 +412,13 @@ export function formatTimeShort(date: string) {
   const diffMonths = now.diff(inputDate, "month");
   const diffYears = now.diff(inputDate, "year");
 
-  if (diffSeconds < 60) return `${diffSeconds} s`;
-  if (diffMinutes < 60) return `${diffMinutes} m`;
-  if (diffHours < 24) return `${diffHours} h`;
-  if (diffDays < 7) return `${diffDays} d`;
-  if (diffWeeks < 4) return `${diffWeeks} w`;
-  if (diffMonths < 12) return `${diffMonths} M`;
-  return `${diffYears}Y`;
+  if (diffSeconds < 60) return __("{0} s", [diffSeconds]);
+  if (diffMinutes < 60) return __("{0} m", [diffMinutes]);
+  if (diffHours < 24) return __("{0} h", [diffHours]);
+  if (diffDays < 7) return __("{0} d", [diffDays]);
+  if (diffWeeks < 4) return __("{0} w", [diffWeeks]);
+  if (diffMonths < 12) return __("{0} M", [diffMonths]);
+  return __("{0}Y", [diffYears]);
 }
 
 function hasArabicContent(content: string) {
@@ -741,7 +739,7 @@ export function getFieldDependencyLabel(name: string) {
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
-      label: "Delete",
+      label: __("Delete"),
       icon: "lucide-trash-2",
       // preventDefault keeps the menu open so the confirm row can replace this one
       onClick: (event) => {
@@ -751,7 +749,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => !isConfirmingDelete.value,
     },
     {
-      label: "Confirm Delete",
+      label: __("Confirm Delete"),
       icon: "lucide-trash-2",
       theme: "red",
       onClick: () => {
@@ -883,24 +881,28 @@ export function shortDuration(target: string): string {
   const seconds = Math.abs(dayjsLocal(target).diff(dayjsLocal(), "second"));
   if (seconds >= YEAR) {
     const years = Math.floor(seconds / YEAR);
-    return `${years} ${years === 1 ? "year" : "years"}`;
+    return years === 1 ? __("{0} year", [years]) : __("{0} years", [years]);
   }
   if (seconds >= MONTH) {
     const months = Math.floor(seconds / MONTH);
-    return `${months} ${months === 1 ? "month" : "months"}`;
+    return months === 1
+      ? __("{0} month", [months])
+      : __("{0} months", [months]);
   }
   if (seconds >= DAY) {
     const days = Math.floor(seconds / DAY);
     const hours = Math.floor((seconds % DAY) / HOUR);
-    const dayLabel = `${days} ${days === 1 ? "day" : "days"}`;
-    return hours ? `${dayLabel} ${hours}h` : dayLabel;
+    const dayLabel =
+      days === 1 ? __("{0} day", [days]) : __("{0} days", [days]);
+    return hours ? `${dayLabel} ${__("{0}h", [hours])}` : dayLabel;
   }
   if (seconds >= HOUR) {
     const hours = Math.floor(seconds / HOUR);
     const minutes = Math.floor((seconds % HOUR) / MINUTE);
-    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+    const hoursLabel = __("{0}h", [hours]);
+    return minutes ? `${hoursLabel} ${__("{0}m", [minutes])}` : hoursLabel;
   }
-  return `${Math.floor(seconds / MINUTE)}m`;
+  return __("{0}m", [Math.floor(seconds / MINUTE)]);
 }
 
 export function buildPercentageChange(
@@ -952,19 +954,19 @@ export function handleInviteUserSuccess(
 ) {
   let emailsStr = emailsToStr(data.invited_emails);
   if (emailsStr.trim() !== "") {
-    toast.success(`${emailsStr} invited successfully`);
+    toast.success(__("{0} invited successfully", [emailsStr]));
   }
   emailsStr = emailsToStr(data.disabled_user_emails);
   if (emailsStr.trim() !== "") {
-    toast.info(`${emailsStr} already present and disabled`);
+    toast.info(__("{0} already present and disabled", [emailsStr]));
   }
   emailsStr = emailsToStr(data.pending_invite_emails);
   if (emailsStr.trim() !== "") {
-    toast.info(`${emailsStr} already invited`);
+    toast.info(__("{0} already invited", [emailsStr]));
   }
   emailsStr = emailsToStr(data.accepted_invite_emails);
   if (emailsStr.trim() !== "") {
-    toast.info(`${emailsStr} already present`);
+    toast.info(__("{0} already present", [emailsStr]));
   }
 }
 

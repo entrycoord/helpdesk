@@ -9,7 +9,7 @@
           <FormControl
             size="sm"
             type="text"
-            placeholder="My Open Tickets"
+            :placeholder="__('My Open Tickets')"
             v-model="view.label"
           />
         </div>
@@ -116,16 +116,16 @@ const modalInfo = computed(() => {
   return {
     modalTitle:
       viewDialogConfig.value.mode === "edit"
-        ? "Edit View"
+        ? __("Edit View")
         : viewDialogConfig.value.mode === "duplicate"
-        ? "Duplicate View"
-        : "Create View",
+        ? __("Duplicate View")
+        : __("Create View"),
     buttonLabel:
       viewDialogConfig.value.mode === "edit"
-        ? "Update"
+        ? __("Update")
         : viewDialogConfig.value.mode === "duplicate"
-        ? "Duplicate"
-        : "Create",
+        ? __("Duplicate")
+        : __("Create"),
     action:
       viewDialogConfig.value.mode === "edit"
         ? "update"

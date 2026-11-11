@@ -33,11 +33,11 @@
               {{
                 selectedCount === 1
                   ? selectedOptions[0]?.label
-                  : `${selectedCount} ${selectionText}`
+                  : `${selectedCount} ${__(selectionText)}`
               }}
             </span>
           </template>
-          <span v-else class="text-ink-gray-6">{{ placeholder }}</span>
+          <span v-else class="text-ink-gray-6">{{ __(placeholder) }}</span>
         </div>
         <template #suffix>
           <LucideChevronDown
@@ -60,7 +60,7 @@
           <input
             ref="inputRef"
             v-model="filterText"
-            :placeholder="label"
+            :placeholder="__(label)"
             class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-6 placeholder-ink-gray-4"
             @click.stop
             @keydown="handleInputKeydown"
@@ -173,7 +173,7 @@
           v-if="filteredOptions.length === 0"
           class="px-2 py-4 text-center text-sm text-ink-gray-5"
         >
-          No options found
+          {{ __("No options found") }}
         </div>
       </div>
     </div>

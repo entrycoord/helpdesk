@@ -55,7 +55,7 @@
               {{ ticket.subject }}
             </td>
             <td class="p-2 py-3 min-w-16 truncate">
-              {{ ticket.status }}
+              {{ __(ticket.status) }}
             </td>
             <td class="p-2 py-3 min-w-28 truncate">
               <TicketPriority :priority="ticket.priority" />

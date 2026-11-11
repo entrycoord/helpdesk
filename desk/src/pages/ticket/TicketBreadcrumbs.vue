@@ -4,7 +4,7 @@
       <Breadcrumbs
         :items="[
           {
-            label: 'Tickets',
+            label: __('Tickets'),
             route: {
               name: parent,
             },

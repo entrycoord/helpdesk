@@ -138,11 +138,11 @@ type RoleOption = {
 const roleToLabel = (role: Role) => {
   switch (role) {
     case "Agent":
-      return "Agent";
+      return __("Agent");
     case "Agent Manager":
-      return "Manager";
+      return __("Manager");
     case "System Manager":
-      return "Admin";
+      return __("Admin");
     default:
       const x: never = role;
       throw new Error(`Invalid role: ${x}`);

@@ -7,7 +7,7 @@
       <div class="flex items-center text-xs uppercase">
         <div
           class="flex size-7.5 items-center justify-center text-center text-ink-gray-5"
-          v-for="(d, i) in ['s', 'm', 't', 'w', 't', 'f', 's']"
+          v-for="(d, i) in weekdayInitials"
           :key="i"
         >
           {{ d }}
@@ -115,7 +115,7 @@
                         class="w-full flex !justify-start"
                         icon-left="lucide-edit"
                         variant="ghost"
-                        label="Edit"
+                        :label="__('Edit')"
                         @click="
                           () => {
                             closePopover();
@@ -129,7 +129,9 @@
                         icon-left="lucide-trash-2"
                         variant="ghost"
                         :label="
-                          isConfirmingDelete ? 'Confirm Delete' : 'Delete'
+                          isConfirmingDelete
+                            ? __('Confirm Delete')
+                            : __('Delete')
                         "
                         :theme="isConfirmingDelete ? 'red' : 'gray'"
                         @click="
@@ -172,10 +174,11 @@
 
 <script setup lang="ts">
 import { holidayData } from "@/stores/holidayList";
+import { __ } from "@/translation";
 import { getFormattedDate, htmlToText } from "@/utils";
 import { dayjs, Popover } from "frappe-ui";
 import { useDatePicker } from "@/composables/useDatePicker";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
 const dialog = ref({
@@ -194,6 +197,17 @@ const {
 } = useDatePicker();
 // Workaround to fix type errors
 const datesAsWeeks = daw as unknown as Date[][];
+// Sunday first, localized to the site language.
+const weekdayInitials = computed(() => {
+  const formatter = new Intl.DateTimeFormat((window as any).lang || "en-US", {
+    weekday: "narrow",
+    timeZone: "UTC",
+  });
+  // 2023-01-01 was a Sunday
+  return Array.from({ length: 7 }, (_, i) =>
+    formatter.format(new Date(Date.UTC(2023, 0, 1 + i)))
+  );
+});
 const isConfirmingDelete = ref(false);
 const popoverTimeouts = ref({});
 
@@ -325,7 +339,7 @@ const getHolidayDescription = (date: Date): string => {
   });
 
   const text = holiday?.weekly_off
-    ? `${htmlToText(holiday?.description || "")}: Recurring holiday`
+    ? __("{0}: Recurring holiday", [htmlToText(holiday?.description || "")])
     : htmlToText(holiday?.description || "");
 
   return text;

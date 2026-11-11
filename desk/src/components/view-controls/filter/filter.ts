@@ -133,7 +133,7 @@ export function useFilter(): Filter {
     getOperators,
     getDefaultOperator,
     getSelectOptions,
-    timespanOptions,
+    timespanOptions: getTimespanOptions(),
   };
 }
 
@@ -215,23 +215,23 @@ function toUiValue(field: FilterField, value: any): any {
 
 function getOperators(fieldtype: string, fieldname?: string) {
   const equality = [
-    { label: "Equals", value: "equals" },
-    { label: "Not Equals", value: "not equals" },
+    { label: __("Equals"), value: "equals" },
+    { label: __("Not Equals"), value: "not equals" },
   ];
   const like = [
-    { label: "Like", value: "like" },
-    { label: "Not Like", value: "not like" },
+    { label: __("Like"), value: "like" },
+    { label: __("Not Like"), value: "not like" },
   ];
   const inclusion = [
-    { label: "In", value: "in" },
-    { label: "Not In", value: "not in" },
+    { label: __("In"), value: "in" },
+    { label: __("Not In"), value: "not in" },
   ];
-  const is = [{ label: "Is", value: "is" }];
+  const is = [{ label: __("Is"), value: "is" }];
   const comparison = [
-    { label: "Less Than", value: "<" },
-    { label: "Greater Than", value: ">" },
-    { label: "Less Than or Equal To", value: "<=" },
-    { label: "Greater Than or Equal To", value: ">=" },
+    { label: __("Less Than"), value: "<" },
+    { label: __("Greater Than"), value: ">" },
+    { label: __("Less Than or Equal To"), value: "<=" },
+    { label: __("Greater Than or Equal To"), value: ">=" },
   ];
 
   if (fieldname && multiValueFields.includes(fieldname))
@@ -250,8 +250,8 @@ function getOperators(fieldtype: string, fieldname?: string) {
       ...equality,
       ...is,
       ...comparison,
-      { label: "Between", value: "between" },
-      { label: "Timespan", value: "timespan" },
+      { label: __("Between"), value: "between" },
+      { label: __("Timespan"), value: "timespan" },
     ];
   }
   if (typeRating.includes(fieldtype))
@@ -302,19 +302,19 @@ export function fieldIcon(field: FilterField): Component {
 
 export function filterSummary(filter: ActiveFilter): string {
   const operatorLabels: Record<string, string> = {
-    equals: "is",
-    "not equals": "is not",
-    like: "contains",
-    "not like": "doesn't contain",
-    in: "in",
-    "not in": "not in",
-    is: "is",
-    between: "between",
-    timespan: "in",
-    ">": "greater than",
-    "<": "less than",
-    ">=": "greater than or equal to",
-    "<=": "less than or equal to",
+    equals: __("is"),
+    "not equals": __("is not"),
+    like: __("contains"),
+    "not like": __("doesn't contain"),
+    in: __("in"),
+    "not in": __("not in"),
+    is: __("is"),
+    between: __("between"),
+    timespan: __("in"),
+    ">": __("greater than"),
+    "<": __("less than"),
+    ">=": __("greater than or equal to"),
+    "<=": __("less than or equal to"),
   };
   return `${filter.field.label} ${
     operatorLabels[filter.operator] || filter.operator
@@ -369,29 +369,31 @@ const oppositeOperatorMap: Record<string, string> = Object.fromEntries(
   Object.entries(operatorMap).map(([ui, frappe]) => [frappe, ui])
 );
 
-const timespanOptions = [
-  { label: "Today", value: "today" },
-  { label: "Yesterday", value: "yesterday" },
-  { label: "Tomorrow", value: "tomorrow" },
-  { label: "Last 7 Days", value: "last 7 days" },
-  { label: "Last 14 Days", value: "last 14 days" },
-  { label: "Last 30 Days", value: "last 30 days" },
-  { label: "Last 90 Days", value: "last 90 days" },
-  { label: "Last Week", value: "last week" },
-  { label: "Last Month", value: "last month" },
-  { label: "Last Quarter", value: "last quarter" },
-  { label: "Last 6 Months", value: "last 6 months" },
-  { label: "Last Year", value: "last year" },
-  { label: "This Week", value: "this week" },
-  { label: "This Month", value: "this month" },
-  { label: "This Quarter", value: "this quarter" },
-  { label: "This Year", value: "this year" },
-  { label: "Next Week", value: "next week" },
-  { label: "Next Month", value: "next month" },
-  { label: "Next Quarter", value: "next quarter" },
-  { label: "Next 6 Months", value: "next 6 months" },
-  { label: "Next Year", value: "next year" },
-  { label: "Next 7 Days", value: "next 7 days" },
-  { label: "Next 14 Days", value: "next 14 days" },
-  { label: "Next 30 Days", value: "next 30 days" },
-];
+function getTimespanOptions() {
+  return [
+    { label: __("Today"), value: "today" },
+    { label: __("Yesterday"), value: "yesterday" },
+    { label: __("Tomorrow"), value: "tomorrow" },
+    { label: __("Last 7 Days"), value: "last 7 days" },
+    { label: __("Last 14 Days"), value: "last 14 days" },
+    { label: __("Last 30 Days"), value: "last 30 days" },
+    { label: __("Last 90 Days"), value: "last 90 days" },
+    { label: __("Last Week"), value: "last week" },
+    { label: __("Last Month"), value: "last month" },
+    { label: __("Last Quarter"), value: "last quarter" },
+    { label: __("Last 6 Months"), value: "last 6 months" },
+    { label: __("Last Year"), value: "last year" },
+    { label: __("This Week"), value: "this week" },
+    { label: __("This Month"), value: "this month" },
+    { label: __("This Quarter"), value: "this quarter" },
+    { label: __("This Year"), value: "this year" },
+    { label: __("Next Week"), value: "next week" },
+    { label: __("Next Month"), value: "next month" },
+    { label: __("Next Quarter"), value: "next quarter" },
+    { label: __("Next 6 Months"), value: "next 6 months" },
+    { label: __("Next Year"), value: "next year" },
+    { label: __("Next 7 Days"), value: "next 7 days" },
+    { label: __("Next 14 Days"), value: "next 14 days" },
+    { label: __("Next 30 Days"), value: "next 30 days" },
+  ];
+}

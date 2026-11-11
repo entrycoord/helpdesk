@@ -2,13 +2,13 @@
   <Dialog
     v-model:open="dialog.show"
     size="sm"
-    :title="dialog.editing ? 'Edit Holiday' : 'Add Holiday'"
+    :title="dialog.editing ? __('Edit Holiday') : __('Add Holiday')"
     @after-leave="resetForm"
   >
     <template #default>
       <div class="flex flex-col gap-4 mt-4">
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Date" required />
+          <FormLabel :label="__('Date')" required />
           <DatePicker
             :model-value="dayjs(dialog.holiday_date).format('YYYY-MM-DD')"
             @update:model-value="
@@ -19,7 +19,7 @@
             "
             :format="getDateFormat()"
             variant="subtle"
-            placeholder="Date"
+            :placeholder="__('Date')"
             class="w-full"
             id="holiday_date"
             required
@@ -31,8 +31,8 @@
             :type="'textarea'"
             size="sm"
             variant="subtle"
-            placeholder="National holiday, etc."
-            label="Description"
+            :placeholder="__('National holiday, etc.')"
+            :label="__('Description')"
             v-model="dialog.description"
             required
             @change="errors.description = ''"
@@ -46,13 +46,13 @@
         <Button
           variant="subtle"
           theme="gray"
-          label="Cancel"
+          :label="__('Cancel')"
           @click="dialog.show = false"
         />
         <Button
           variant="solid"
           icon-left="lucide-plus"
-          label="Add Holiday"
+          :label="__('Add Holiday')"
           @click="onSave"
         />
       </div>
@@ -74,6 +74,7 @@ import {
 } from "frappe-ui";
 import { ref } from "vue";
 import { holidayData } from "@/stores/holidayList";
+import { __ } from "@/translation";
 
 interface ModelType {
   show: boolean;
@@ -100,10 +101,10 @@ const resetForm = () => {
 
 const onSave = () => {
   if (dialog.value.description?.trim() === "") {
-    errors.value.description = "Please enter a description";
+    errors.value.description = __("Please enter a description");
   }
   if (!dialog.value.holiday_date) {
-    errors.value.holiday_date = "Please enter a valid date";
+    errors.value.holiday_date = __("Please enter a valid date");
   }
 
   if (errors.value.holiday_date || errors.value.description) {
@@ -116,9 +117,10 @@ const onSave = () => {
 
   if (holidayDate.isBefore(fromDate) || holidayDate.isAfter(toDate)) {
     toast.error(
-      `Holiday date must be between ${getFormattedDate(
-        holidayData.value.from_date
-      )} and ${getFormattedDate(holidayData.value.to_date)}`
+      __("Holiday date must be between {0} and {1}", [
+        getFormattedDate(holidayData.value.from_date),
+        getFormattedDate(holidayData.value.to_date),
+      ])
     );
     return;
   }

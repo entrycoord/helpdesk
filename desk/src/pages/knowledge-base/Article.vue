@@ -9,7 +9,7 @@
             variant="subtle"
             :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
             size="md"
-            >{{ article.data?.status }}</Badge
+            >{{ __(article.data?.status) }}</Badge
           >
         </div>
       </template>
@@ -200,7 +200,9 @@
             />
             <div class="flex flex-col justify-start gap-1">
               <p class="truncate capitalize text-p-base-medium text-ink-gray-9">
-                <span class="text-base text-ink-gray-5">published by </span>
+                <span class="text-base text-ink-gray-5"
+                  >{{ __("published by") }}
+                </span>
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
@@ -217,7 +219,7 @@
                 <span
                   v-if="!editable && !isCustomerPortal && isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
-                  >{{ views }} views</span
+                  >{{ views }} {{ __("views") }}</span
                 >
               </div>
             </div>
@@ -454,8 +456,8 @@ const toggleStatus = debounce(() => {
     {
       onSuccess: () => {
         if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+          toast.success(__("Article published successfully."));
+        else toast.success(__("Article unpublished successfully."));
         article.reload();
       },
     }

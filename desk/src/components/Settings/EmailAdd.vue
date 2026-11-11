@@ -38,7 +38,7 @@
                     :href="selectedService.link"
                     target="_blank"
                     class="text-ink-blue-5 underline"
-                    >here</a
+                    >{{ __("here") }}</a
                   >
                   .
                 </div>
@@ -171,17 +171,27 @@ import { useOnboarding } from "@framework/ui";
 import { computed, reactive, Ref, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import {
-  customIncomingFields,
-  customOutgoingFields,
-  customProviderTopFields,
-  frappeMailFields,
-  incomingOutgoingFields,
-  popularProviderFields,
-  services,
+  getCustomIncomingFields,
+  getCustomOutgoingFields,
+  getCustomProviderTopFields,
+  getFrappeMailFields,
+  getIncomingOutgoingFields,
+  getPopularProviderFields,
+  getServices,
   validateInputs,
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { __ } from "@/translation";
+
+// emailConfig builds its labels lazily so that `__()` runs after the
+// translation dictionary has loaded
+const customIncomingFields = computed(() => getCustomIncomingFields());
+const customOutgoingFields = computed(() => getCustomOutgoingFields());
+const customProviderTopFields = computed(() => getCustomProviderTopFields());
+const frappeMailFields = computed(() => getFrappeMailFields());
+const incomingOutgoingFields = computed(() => getIncomingOutgoingFields());
+const popularProviderFields = computed(() => getPopularProviderFields());
+const services = computed(() => getServices());
 
 interface E {
   (event: "update:step", value: EmailStep): void;
@@ -266,12 +276,12 @@ const selectedService: Ref<EmailService | null> = ref(null);
 const fields = computed(() => {
   if (!selectedService.value) return [];
   if (selectedService.value.name === "Frappe Mail") {
-    return frappeMailFields;
+    return frappeMailFields.value;
   }
   if (selectedService.value.custom) {
-    return customProviderTopFields;
+    return customProviderTopFields.value;
   }
-  return popularProviderFields;
+  return popularProviderFields.value;
 });
 
 const isCustomSelected = computed(

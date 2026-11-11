@@ -5,7 +5,7 @@
         ref="searchInput"
         v-model="query"
         type="text"
-        :placeholder="placeholder"
+        :placeholder="__(placeholder)"
         autocomplete="off"
         @keydown="onKeydown"
         variant="outline"

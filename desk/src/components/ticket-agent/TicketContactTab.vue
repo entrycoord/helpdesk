@@ -28,12 +28,7 @@
           </p>
           <CopyIcon
             class="size-4 cursor-pointer"
-            @click="
-              copyToClipboard(
-                contact.data.email_id,
-                `'${contact.data.email_id}' copied to clipboard`
-              )
-            "
+            @click="copyValue(contact.data.email_id)"
           />
         </div>
         <!-- Mobile Number -->
@@ -50,14 +45,7 @@
           <CopyIcon
             class="size-4 cursor-pointer"
             v-if="contact.data.mobile_no || contact.data.phone"
-            @click="
-              copyToClipboard(
-                contact.data.mobile_no || contact.data.phone,
-                `'${
-                  contact.data.mobile_no || contact.data.phone
-                }' copied to clipboard`
-              )
-            "
+            @click="copyValue(contact.data.mobile_no || contact.data.phone)"
           />
         </div>
       </div>
@@ -113,7 +101,7 @@
                   class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
                   :class="getStatusColor(ticket.status)"
                 >
-                  {{ ticket.status }}
+                  {{ __(ticket.status) }}
                 </p>
               </div>
             </li>
@@ -127,6 +115,7 @@
 <script setup lang="ts">
 import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import dayjs from "dayjs";
@@ -166,8 +155,8 @@ const sections = computed(() => {
   const _sections = [];
   if (recentTickets.length) {
     _sections.push({
-      label: "Recent Tickets",
-      tooltipMessage: "Tickets recently raised by this contact/customer",
+      label: __("Recent Tickets"),
+      tooltipMessage: __("Tickets recently raised by this contact/customer"),
       hideLabel: false,
       opened: true,
       tickets: recentTickets,
@@ -175,8 +164,8 @@ const sections = computed(() => {
   }
   if (similarTickets.length) {
     _sections.push({
-      label: "Similar Tickets",
-      tooltipMessage: "Tickets with similar queries",
+      label: __("Similar Tickets"),
+      tooltipMessage: __("Tickets with similar queries"),
       hideLabel: false,
       opened: true,
       tickets: similarTickets,
@@ -184,6 +173,10 @@ const sections = computed(() => {
   }
   return _sections;
 });
+
+function copyValue(value: string) {
+  copyToClipboard(value, __("'{0}' copied to clipboard", [value]));
+}
 
 function formatDate(date: string) {
   return dayjs(date).format(dateFormat.toUpperCase());

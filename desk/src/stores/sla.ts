@@ -110,7 +110,9 @@ export function validateSlaData(
     switch (field) {
       case "service_level":
         if (!slaData.value.service_level?.trim()) {
-          slaDataErrors.value.service_level = __("SLA policy name is required.");
+          slaDataErrors.value.service_level = __(
+            "SLA policy name is required."
+          );
         } else {
           slaDataErrors.value.service_level = "";
         }
@@ -120,25 +122,29 @@ export function validateSlaData(
           !Array.isArray(slaData.value.priorities) ||
           slaData.value.priorities.length === 0
         ) {
-          slaDataErrors.value.priorities = __("At least one priority is required.");
+          slaDataErrors.value.priorities = __(
+            "At least one priority is required."
+          );
         } else {
           const prioritiesError: string[] = [];
           slaData.value.priorities.forEach((priority, index) => {
             const priorityNum = index + 1;
             if (!priority.priority?.trim()) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Priority name is required.`
+                __("Priority {0}: Priority name is required.", [priorityNum])
               );
             }
             if (!priority.response_time || priority.response_time == 0) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time is required.`
+                __("Priority {0}: Response time is required.", [priorityNum])
               );
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
               if (!priority.resolution_time || priority.resolution_time == 0) {
                 prioritiesError.push(
-                  `Priority ${priorityNum}: Resolution time is required.`
+                  __("Priority {0}: Resolution time is required.", [
+                    priorityNum,
+                  ])
                 );
               }
             }
@@ -147,7 +153,10 @@ export function validateSlaData(
               Boolean(slaData.value.apply_sla_for_resolution)
             ) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time cannot be greater than resolution time.`
+                __(
+                  "Priority {0}: Response time cannot be greater than resolution time.",
+                  [priorityNum]
+                )
               );
             }
           });
@@ -159,7 +168,7 @@ export function validateSlaData(
           const uniquePriorities = new Set(priorityNames);
 
           if (priorityNames.length !== uniquePriorities.size) {
-            prioritiesError.push("Priorities must be unique");
+            prioritiesError.push(__("Priorities must be unique"));
           }
 
           if (prioritiesError.length > 0) {
@@ -172,8 +181,9 @@ export function validateSlaData(
             Boolean(p.default_priority)
           );
           if (!hasDefaultPriority) {
-            slaDataErrors.value.default_priority =
-              "Default priority is required";
+            slaDataErrors.value.default_priority = __(
+              "Default priority is required"
+            );
           } else {
             slaDataErrors.value.default_priority = "";
           }
@@ -181,7 +191,7 @@ export function validateSlaData(
         break;
       case "holiday_list":
         if (!slaData.value.holiday_list) {
-          slaDataErrors.value.holiday_list = "Holiday list is required.";
+          slaDataErrors.value.holiday_list = __("Holiday list is required.");
         } else {
           slaDataErrors.value.holiday_list = "";
         }
@@ -190,8 +200,9 @@ export function validateSlaData(
         if (
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
-          slaDataErrors.value.start_date =
-            "Start date cannot be after end date.";
+          slaDataErrors.value.start_date = __(
+            "Start date cannot be after end date."
+          );
         } else {
           slaDataErrors.value.start_date = "";
         }
@@ -201,7 +212,9 @@ export function validateSlaData(
           slaData.value.end_date &&
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
-          slaDataErrors.value.end_date = "End date cannot be before start date.";
+          slaDataErrors.value.end_date = __(
+            "End date cannot be before start date."
+          );
         } else {
           slaDataErrors.value.end_date = "";
         }
@@ -214,7 +227,7 @@ export function validateSlaData(
           slaData.value.condition_json.length > 0 &&
           !validateConditions(slaData.value.condition_json)
         ) {
-          slaDataErrors.value.condition = "Valid conditions are required.";
+          slaDataErrors.value.condition = __("Valid conditions are required.");
         } else {
           slaDataErrors.value.condition = "";
         }
@@ -231,8 +244,9 @@ export function validateSlaData(
         );
 
         if (!validWorkdays?.length) {
-          slaDataErrors.value.support_and_resolution =
-            "At least one valid workday with workday, start time, and end time is required.";
+          slaDataErrors.value.support_and_resolution = __(
+            "At least one valid workday with workday, start time, and end time is required."
+          );
         } else {
           // Check for duplicate workdays
           const workdayMap = new Map();
@@ -247,9 +261,10 @@ export function validateSlaData(
           }
 
           if (duplicateWorkdays.length > 0) {
-            slaDataErrors.value.support_and_resolution = `Duplicate workday found: ${duplicateWorkdays.join(
-              ", "
-            )}. Each workday should be unique.`;
+            slaDataErrors.value.support_and_resolution = __(
+              "Duplicate workday found: {0}. Each workday should be unique.",
+              [duplicateWorkdays.map((workday) => __(workday)).join(", ")]
+            );
             return slaDataErrors.value;
           } else {
             slaDataErrors.value.support_and_resolution = "";
@@ -262,19 +277,20 @@ export function validateSlaData(
 
             if (toMinutes(startTimeStr) >= toMinutes(endTimeStr)) {
               invalidTimeRanges.push(
-                `${day.workday} (${startTimeStr} - ${endTimeStr})`
+                `${__(day.workday)} (${startTimeStr} - ${endTimeStr})`
               );
             }
           }
 
           const invalidBreaks = slaData.value.support_and_resolution
             .filter((day) => getBreakError(day))
-            .map((day) => `${day.workday}: ${getBreakError(day)}`);
+            .map((day) => `${__(day.workday)}: ${getBreakError(day)}`);
 
           if (invalidTimeRanges.length > 0) {
-            slaDataErrors.value.support_and_resolution = `End time must be after start time for: ${invalidTimeRanges.join(
-              ", "
-            )}`;
+            slaDataErrors.value.support_and_resolution = __(
+              "End time must be after start time for: {0}",
+              [invalidTimeRanges.join(", ")]
+            );
           } else if (invalidBreaks.length > 0) {
             slaDataErrors.value.support_and_resolution =
               invalidBreaks.join(" ");

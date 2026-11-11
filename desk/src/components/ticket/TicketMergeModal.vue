@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Merge with another ticket" v-model:open="showDialog">
+  <Dialog :title="__('Merge with another ticket')" v-model:open="showDialog">
     <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
@@ -90,7 +90,9 @@
         class="w-full"
         variant="solid"
         :label="
-          targetTicket ? `Merge with ticket #${targetTicket} ` : 'Select Ticket'
+          targetTicket
+            ? __('Merge with ticket #{0}', [targetTicket])
+            : __('Select Ticket')
         "
         :loading="mergeTicket.loading"
         :icon-left="targetTicket && LucideMerge"

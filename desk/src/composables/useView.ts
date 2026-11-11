@@ -5,12 +5,7 @@ import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
-import {
-  call,
-  createListResource,
-  createResource,
-  toast,
-} from "frappe-ui";
+import { call, createListResource, createResource, toast } from "frappe-ui";
 import { Icon } from "frappe-ui/experimental";
 import { computed, h, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -24,7 +19,6 @@ const debouncedSetValue = useDebounceFn(
   },
   300
 );
-
 
 export const views = createListResource({
   doctype: "HD View",
@@ -164,7 +158,7 @@ export function useView(dt: string = null) {
     if (defaultView) {
       delete view["name"];
 
-       debouncedSetValue("HD View", defaultView.name, view);
+      debouncedSetValue("HD View", defaultView.name, view);
     } else {
       view["doctype"] = "HD View";
       // create default view
@@ -208,7 +202,7 @@ export function useView(dt: string = null) {
             label: __("Duplicate"),
             icon: h(Icon, { name: "copy" }),
             onClick: () => {
-              viewDialogConfig.view.label = _view.label + " (New)";
+              viewDialogConfig.view.label = __("{0} (New)", [_view.label]);
               viewDialogConfig.view.icon = _view.icon;
               viewDialogConfig.view.name = _view.name;
               viewDialogConfig.mode = "duplicate";

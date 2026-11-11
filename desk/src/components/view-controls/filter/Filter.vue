@@ -88,7 +88,7 @@
                       class="!text-ink-gray-5"
                       :label="__('Add filter')"
                       @click="addNewFilter()"
-                      tooltip="Add Filter (A)"
+                      :tooltip="__('Add Filter (A)')"
                     >
                       <template #prefix>
                         <LucidePlus class="size-4" />

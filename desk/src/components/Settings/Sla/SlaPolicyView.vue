@@ -132,11 +132,11 @@
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">
-                  Conditions for this SLA were created from
-                  <a :href="deskUrl" target="_blank" class="underline">desk</a>
-                  which are not compatible with this UI, you will need to
-                  recreate the conditions here if you want to manage and add new
-                  conditions from this UI.
+                  {{ legacyConditionText[0] }}
+                  <a :href="deskUrl" target="_blank" class="underline">{{
+                    __("desk")
+                  }}</a>
+                  {{ legacyConditionText[1] }}
                 </span>
                 <Button
                   :label="__('I understand, add conditions')"
@@ -303,7 +303,15 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { inject, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
 import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
@@ -332,6 +340,13 @@ const isOldSla = ref(false);
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 const deskUrl = `${window.location.origin}/app/hd-service-level-agreement/${slaActiveScreen.value.data?.name}`;
 
+// One sentence with the link in the middle; the translator decides where {0} goes
+const legacyConditionText = computed(() =>
+  __(
+    "Conditions for this SLA were created from {0} which are not compatible with this UI, you will need to recreate the conditions here if you want to manage and add new conditions from this UI."
+  ).split("{0}")
+);
+
 const getSlaData = createResource({
   url: "frappe.client.get",
   params: {
@@ -344,7 +359,9 @@ const getSlaData = createResource({
       condition_json = JSON.parse(data.condition_json || "[]");
     } catch (error) {
       toast.error(
-        "Assignment conditions are invalid or corrupt, recreate the conditions."
+        __(
+          "Assignment conditions are invalid or corrupt, recreate the conditions."
+        )
       );
       condition_json = [];
     }

@@ -26,7 +26,7 @@
                   :href="info.link"
                   target="_blank"
                   class="text-ink-blue-5 underline"
-                  >here</a
+                  >{{ __("here") }}</a
                 >.
               </span>
               <span v-if="deskEditUrl" class="flex items-center gap-1">
@@ -171,17 +171,27 @@ import CircleAlert from "~icons/lucide/circle-alert";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { Link } from "@/components";
 import {
-  customIncomingFields,
-  customOutgoingFields,
-  customProviderTopFields,
   emailIcon,
-  frappeMailFields,
-  incomingOutgoingFields,
-  popularProviderFields,
-  services,
+  getCustomIncomingFields,
+  getCustomOutgoingFields,
+  getCustomProviderTopFields,
+  getFrappeMailFields,
+  getIncomingOutgoingFields,
+  getPopularProviderFields,
+  getServices,
   validateInputs,
 } from "./emailConfig";
 import { __ } from "@/translation";
+
+// emailConfig builds its labels lazily so that `__()` runs after the
+// translation dictionary has loaded
+const customIncomingFields = computed(() => getCustomIncomingFields());
+const customOutgoingFields = computed(() => getCustomOutgoingFields());
+const customProviderTopFields = computed(() => getCustomProviderTopFields());
+const frappeMailFields = computed(() => getFrappeMailFields());
+const incomingOutgoingFields = computed(() => getIncomingOutgoingFields());
+const popularProviderFields = computed(() => getPopularProviderFields());
+const services = computed(() => getServices());
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface EmailAccountBaseState {
@@ -287,7 +297,7 @@ const currentServiceName = computed(
 
 const serviceDef = computed(() => {
   const currentService = currentServiceName.value;
-  return services.find((s) => s.name === currentService);
+  return services.value.find((s) => s.name === currentService);
 });
 
 const isCustomProvider = computed(() => {
@@ -309,15 +319,15 @@ const isCustomProvider = computed(() => {
 
 const fields = computed(() => {
   if (isCustomProvider.value) {
-    return customProviderTopFields;
+    return customProviderTopFields.value;
   }
   if (!serviceDef.value) {
-    return popularProviderFields;
+    return popularProviderFields.value;
   }
   if (serviceDef.value.name === "Frappe Mail") {
-    return frappeMailFields;
+    return frappeMailFields.value;
   }
-  return popularProviderFields;
+  return popularProviderFields.value;
 });
 
 const error = ref<string | undefined>();

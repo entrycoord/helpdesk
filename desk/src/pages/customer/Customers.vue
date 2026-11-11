@@ -64,7 +64,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No customers found",
+      title: __("No customers found"),
       description: hasActiveFilters.value
         ? __(
             "No customers found for the applied filters. Try adjusting or clearing your filters."
@@ -83,7 +83,7 @@ const options = computed(() => {
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: __("Customers"),
   };
 });
 </script>

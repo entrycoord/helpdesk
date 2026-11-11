@@ -516,9 +516,9 @@ const filterableFields = createResource({
   transform: (data) => {
     data = data.map((field) => {
       return {
-        label: field.label,
         value: field.fieldname,
         ...field,
+        label: __(field.label),
       };
     });
     return data;
@@ -528,6 +528,10 @@ const filterableFields = createResource({
 const sortableFields = createResource({
   url: "helpdesk.api.doc.sort_options",
   auto: !options.value.hideViewControls,
+  transform: (data) =>
+    Array.isArray(data)
+      ? data.map((option) => ({ ...option, label: __(option.label) }))
+      : data,
   params: {
     doctype: options.value.doctype,
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
@@ -543,7 +547,7 @@ const quickFilters = createResource({
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
-    data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+    data = [{ name: "name", label: __("Name"), fieldtype: "Data" }];
     return data;
   },
 });

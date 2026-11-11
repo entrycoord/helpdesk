@@ -48,8 +48,7 @@
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
-              {{ __("Your performance is") }}
-              {{ performance }}!
+              {{ __("Your performance is {0}!", [performance]) }}
             </div>
           </div>
           <div v-else>

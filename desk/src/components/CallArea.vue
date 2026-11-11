@@ -77,7 +77,7 @@
           </template>
         </Badge>
         <Badge
-          :label="statusLabelMap[activity.status]"
+          :label="__(statusLabelMap[activity.status])"
           :theme="statusColorMap[activity.status]"
         />
       </div>

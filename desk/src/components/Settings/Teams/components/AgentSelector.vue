@@ -35,7 +35,7 @@
             :value="query"
             autocomplete="off"
             class="bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-full placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0 w-full select-none rtl:text-right"
-            placeholder="Type agent name or email"
+            :placeholder="__('Type agent name or email')"
             @focus="showOptions = true"
             @click="showOptions = true"
             @input="onInput"
@@ -55,7 +55,7 @@
               <ComboboxEmpty
                 class="flex gap-2 rounded-4 px-2 py-1 text-base text-ink-gray-5"
               >
-                Agent not found
+                {{ __("Agent not found") }}
               </ComboboxEmpty>
               <ComboboxItem
                 v-for="agent in agentsList"

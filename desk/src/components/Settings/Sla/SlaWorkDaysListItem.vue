@@ -40,7 +40,7 @@
             :key="option.value"
             :value="option.value"
           >
-            {{ option.label }}
+            {{ __(option.label) }}
           </option>
         </select>
       </div>
@@ -126,9 +126,9 @@ const hasBreakColumn = computed(() =>
   props.columns.some((column) => column.key === "break")
 );
 
-const dropdownOptions = [
+const dropdownOptions = computed(() => [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editWorkDay(),
     icon: "lucide-edit",
   },
@@ -136,7 +136,7 @@ const dropdownOptions = [
     onConfirmDelete: () => deleteWorkDay(),
     isConfirmingDelete,
   }),
-];
+]);
 
 const deleteWorkDay = () => {
   if (!isConfirmingDelete.value) {

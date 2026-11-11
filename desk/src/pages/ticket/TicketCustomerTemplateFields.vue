@@ -1,20 +1,24 @@
 <template>
   <div class="space-y-2 px-6 py-3.5 border-b">
     <div class="flex items-center gap-4">
-      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Status</span>
+      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
+        __("Status")
+      }}</span>
       <span
         class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
-        {{ ticket.data.status }}
+        {{ __(ticket.data.status) }}
       </span>
     </div>
 
     <div v-if="ticket.data.priority" class="flex items-center gap-4">
-      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Priority</span>
+      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
+        __("Priority")
+      }}</span>
       <span
         class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
-        {{ ticket.data.priority }}
+        {{ __(ticket.data.priority) }}
       </span>
     </div>
 
@@ -25,7 +29,7 @@
     >
       <Tooltip :text="dayjs(data.value).format('LLLL')">
         <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
-          data.title
+          __(data.title)
         }}</span>
       </Tooltip>
       <span class="flex-1 truncate text-p-sm" :class="data.textColor">
@@ -59,6 +63,7 @@ import {
   type SLAMetric,
 } from "@/composables/useSLA";
 import { Field } from "@/types";
+import { __ } from "@/translation";
 import { computed, inject } from "vue";
 import { ITicket } from "./symbols";
 

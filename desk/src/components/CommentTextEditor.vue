@@ -62,7 +62,7 @@
             </div>
             <div class="flex shrink-0 items-center justify-end gap-x-2">
               <Button
-                label="Discard"
+                :label="__('Discard')"
                 @click="
                   () => {
                     newComment = '';
@@ -80,7 +80,7 @@
                 <span class="inline-flex">
                   <Button
                     variant="solid"
-                    :label="label"
+                    :label="__(label)"
                     :disabled="isDisabled"
                     :loading="loading"
                     @click="submitComment()"

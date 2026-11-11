@@ -8,7 +8,9 @@
     >
       <div class="text-base-medium text-ink-gray-7 flex items-center gap-2">
         {{ data.name }}
-        <Badge v-if="data.default_sla" color="gray" size="sm">Default</Badge>
+        <Badge v-if="data.default_sla" color="gray" size="sm">{{
+          __("Default")
+        }}</Badge>
       </div>
       <div
         v-if="data.description && data.description.length > 0"
@@ -101,7 +103,7 @@ const dropdownOptions = [
     onClick: () => {
       duplicateDialog.value = {
         show: true,
-        newName: props.data.name + " (Copy)",
+        newName: __("{0} (Copy)", [props.data.name]),
         name: props.data.name,
       };
     },

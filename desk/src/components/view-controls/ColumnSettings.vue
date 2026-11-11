@@ -104,32 +104,36 @@
               <FormControl
                 type="text"
                 size="md"
-                label="Label"
+                :label="__('Label')"
                 v-model="column.label"
                 class="sm:w-full w-52"
-                placeholder="First Name"
+                :placeholder="__('First Name')"
               />
               <FormControl
                 type="text"
                 size="md"
-                label="Width"
+                :label="__('Width')"
                 class="sm:w-full w-52"
                 v-model="column.width"
                 placeholder="10rem"
-                :description="'Width can be in number, pixel or rem (eg. 3, 30px, 10rem)'"
+                :description="
+                  __(
+                    'Width can be in number, pixel or rem (eg. 3, 30px, 10rem)'
+                  )
+                "
                 :debounce="500"
               />
             </div>
             <div class="flex w-full gap-2 border-t pt-2">
               <Button
                 variant="subtle"
-                label="Cancel"
+                :label="__('Cancel')"
                 class="w-full flex-1"
                 @click="cancelUpdate"
               />
               <Button
                 variant="solid"
-                label="Update"
+                :label="__('Update')"
                 class="w-full flex-1"
                 @click="updateColumn(column)"
               />

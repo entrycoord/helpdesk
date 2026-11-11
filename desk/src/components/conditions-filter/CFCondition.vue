@@ -17,7 +17,7 @@
     >
       <div :class="'text-end text-base text-ink-gray-5'">
         <div v-if="props.itemIndex == 0" class="min-w-[66px] text-start">
-          Where
+          {{ __("Where") }}
         </div>
         <div v-else class="min-w-[66px] flex items-start">
           <Button
@@ -26,7 +26,7 @@
             @click="toggleConjunction"
             icon-right="lucide-refresh-cw"
             :disabled="props.itemIndex > 2"
-            :label="conjunction"
+            :label="conjunction ? __(conjunction) : conjunction"
           />
         </div>
       </div>
@@ -46,7 +46,7 @@
             v-if="!props.condition[0]"
             disabled
             type="text"
-            :placeholder="'operator'"
+            :placeholder="__('operator')"
             class="w-full"
           />
           <FormControl
@@ -64,7 +64,7 @@
             v-if="!props.condition[0]"
             disabled
             type="text"
-            :placeholder="'condition'"
+            :placeholder="__('condition')"
             class="w-full"
           />
           <component
@@ -72,7 +72,7 @@
             :is="getValueControl()"
             v-model="props.condition[2]"
             @change="updateValue"
-            :placeholder="'condition'"
+            :placeholder="__('condition')"
           />
         </div>
       </div>
@@ -87,7 +87,7 @@
         variant="outline"
         v-if="props.isGroup && (props.level == 2 || props.level == 4)"
         @click="show = true"
-        label="Open nested conditions"
+        :label="__('Open nested conditions')"
       />
     </div>
     <div :class="'w-max'">
@@ -96,7 +96,7 @@
       </Dropdown>
     </div>
   </div>
-  <Dialog v-model:open="show" size="3xl" title="Nested conditions">
+  <Dialog v-model:open="show" size="3xl" :title="__('Nested conditions')">
     <template #default>
       <CFConditions
         :conditions="props.condition"
@@ -110,6 +110,7 @@
 
 <script setup lang="ts">
 import { StarRating } from "@/components";
+import { __ } from "@/translation";
 import { Link } from "@framework/ui";
 import {
   Button,
@@ -169,7 +170,7 @@ const dropdownOptions = computed(() => {
 
   if (!props.isGroup && props.level < 4) {
     options.push({
-      label: "Turn into a group",
+      label: __("Turn into a group"),
       icon: () => h(GroupIcon),
       onClick: () => {
         emit("turnIntoGroup");
@@ -179,7 +180,7 @@ const dropdownOptions = computed(() => {
 
   if (props.isGroup) {
     options.push({
-      label: "Ungroup conditions",
+      label: __("Ungroup conditions"),
       icon: () => h(UnGroupIcon),
       onClick: () => {
         emit("unGroupConditions");
@@ -188,7 +189,7 @@ const dropdownOptions = computed(() => {
   }
 
   options.push({
-    label: "Remove",
+    label: __("Remove"),
     icon: "lucide-trash-2",
     theme: "red",
     onClick: () => {
@@ -198,7 +199,7 @@ const dropdownOptions = computed(() => {
   });
 
   options.push({
-    label: "Remove group",
+    label: __("Remove group"),
     icon: "lucide-trash-2",
     theme: "red",
     onClick: () => {
@@ -242,11 +243,11 @@ function getValueControl() {
       type: "select",
       options: [
         {
-          label: "Set",
+          label: __("Set"),
           value: "set",
         },
         {
-          label: "Not Set",
+          label: __("Not Set"),
           value: "not set",
         },
       ],
@@ -259,7 +260,7 @@ function getValueControl() {
     return h(FormControl, {
       type: "select",
       options: _options.map((o) => ({
-        label: o,
+        label: fieldtype == "Check" ? __(o) : o,
         value: o,
       })),
     });
@@ -325,33 +326,33 @@ function getOperators() {
   if (typeString.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (fieldname === "_assign") {
     options = [
-      { label: "Like", value: "like" },
-      { label: "Not Like", value: "not like" },
-      { label: "Is", value: "is" },
+      { label: __("Like"), value: "like" },
+      { label: __("Not Like"), value: "not like" },
+      { label: __("Is"), value: "is" },
     ];
   }
   if (typeNumber.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
         { label: "<", value: "<" },
         { label: ">", value: ">" },
         { label: "<=", value: "<=" },
@@ -362,61 +363,61 @@ function getOperators() {
   if (typeSelect.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeLink.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeCheck.includes(fieldtype)) {
-    options.push(...[{ label: "Equals", value: "==" }]);
+    options.push(...[{ label: __("Equals"), value: "==" }]);
   }
   if (["Duration"].includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeDate.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("Is"), value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },
         { label: "<=", value: "<=" },
-        { label: "Between", value: "between" },
+        { label: __("Between"), value: "between" },
       ]
     );
   }
   if (typeRating.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "==" },
-        { label: "Not Equals", value: "!=" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "==" },
+        { label: __("Not Equals"), value: "!=" },
+        { label: __("Is"), value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },

@@ -8,8 +8,8 @@
       v-else-if="failed"
       variant="badge"
       :icon="LucideCloudOff"
-      title="Could not load Cloud Settings"
-      description="Please contact support."
+      :title="__('Could not load Cloud Settings')"
+      :description="__('Please contact support.')"
       :actions="[
         {
           label: __('Contact support'),

@@ -50,8 +50,8 @@
           "
           variant="badge"
           :icon="FieldDependencyIcon"
-          title="No field dependency found"
-          description="Add one to get started."
+          :title="__('No field dependency found')"
+          :description="__('Add one to get started.')"
         />
 
         <div

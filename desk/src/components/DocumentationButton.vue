@@ -1,5 +1,5 @@
 <template>
-  <Tooltip text="View documentation">
+  <Tooltip :text="__('View documentation')">
     <a :href="url" target="_blank">
       <lucide-circle-question-mark
         class="h-4 w-4 text-ink-gray-6"

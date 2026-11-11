@@ -234,7 +234,7 @@ function getCallLogDetail(row, log, columns = []) {
     };
   } else if (row === "status") {
     return {
-      label: statusLabelMap[log.status],
+      label: __(statusLabelMap[log.status]),
       color: statusColorMap[log.status],
     };
   } else if (["modified", "creation"].includes(row)) {

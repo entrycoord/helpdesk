@@ -8,7 +8,7 @@
         </div>
       </Tooltip>
       <div class="flex gap-1.5">
-        <Tooltip :text="`Call ${contact.name}`" v-if="isCallingEnabled">
+        <Tooltip :text="__('Call {0}', [contact.name])" v-if="isCallingEnabled">
           <Button @click="callContact">
             <template #icon>
               <PhoneIcon class="size-4" />

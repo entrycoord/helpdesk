@@ -1,8 +1,9 @@
 <template>
-  <Button :label="label" @click="handleDiscard" />
+  <Button :label="__(label)" @click="handleDiscard" />
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { globalStore } from "@/stores/globalStore";
 const { $dialog } = globalStore();
 const emit = defineEmits<{
@@ -27,14 +28,14 @@ function handleDiscard() {
     return;
   }
   $dialog({
-    title: title,
-    message: message,
+    title: __(title),
+    message: __(message),
     onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
       hideDialog();
     },
     actions: [
       {
-        label: "Delete",
+        label: __("Delete"),
         theme: "red",
         iconLeft: "lucide-trash-2",
         variant: "solid",

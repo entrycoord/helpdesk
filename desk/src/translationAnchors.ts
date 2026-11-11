@@ -54,5 +54,37 @@ export function translationAnchors(): string[] {
     __("Development"),
     __("Incident"),
     __("Unspecified"),
+    // SLA rows
+    __("First Response"),
+    __("Expected First Response"),
+    __("Expected Resolution"),
+    // call log statuses
+    __("Completed"),
+    __("Initiated"),
+    __("Declined"),
+    __("Failed"),
+    __("Queued"),
+    __("Canceled"),
+    __("Ringing"),
+    __("Missed Call"),
+    __("In Progress"),
+    // week days
+    __("Monday"),
+    __("Tuesday"),
+    __("Wednesday"),
+    __("Thursday"),
+    __("Friday"),
+    __("Saturday"),
+    __("Sunday"),
+    // dialogs and empty states
+    __("Discard"),
+    __("Discard?"),
+    __("No tickets found"),
+    __(
+      "Dashboard charts will appear here once you start receiving or creating tickets."
+    ),
+    __(
+      "Based on the selected filters no tickets found. Try adjusting the date range or filters applied."
+    ),
   ];
 }

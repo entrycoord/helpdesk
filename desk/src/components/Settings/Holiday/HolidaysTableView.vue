@@ -11,7 +11,7 @@
         :key="column.key"
         class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
       </div>
     </div>
     <hr />
@@ -28,7 +28,7 @@
           <input
             v-if="column.key === 'description'"
             :type="'text'"
-            placeholder="Description"
+            :placeholder="__('Description')"
             v-model="holiday[column.key]"
             class="!bg-surface-base w-full text-base px-0 focus:!ring-0 border-none hover:bg-surface-base outline-none no-underline focus:!outline-none"
           />
@@ -49,7 +49,7 @@
       <hr v-if="index !== holidays.length - 1" />
     </div>
     <div v-if="holidays?.length === 0" class="text-center p-4 text-ink-gray-5">
-      No items in the list
+      {{ __("No items in the list") }}
     </div>
   </div>
   <AddHolidayModal v-model="dialog" />
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { __ } from "@/translation";
 import { ConfirmDelete, getFormattedDate } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
@@ -72,7 +73,7 @@ interface Holiday {
 
 const dropdownOptions = (holiday: Holiday) => [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editHoliday(holiday),
     icon: "lucide-edit",
   },

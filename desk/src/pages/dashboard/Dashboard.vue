@@ -280,44 +280,46 @@ interface ChartEmptyState {
 // Chart key (stable, untranslated identifier from the dashboard APIs) → empty state copy.
 const emptyStateByChart: Record<string, ChartEmptyState> = {
   ticket_trend: {
-    chartTitle: "Ticket Trend",
-    title: "No ticket activity",
-    message: "Ticket trends will appear here once tickets are created.",
+    chartTitle: __("Ticket Trend"),
+    title: __("No ticket activity"),
+    message: __("Ticket trends will appear here once tickets are created."),
   },
   feedback_trend: {
-    chartTitle: "Feedback Trend",
-    title: "No feedback data",
-    message: "Feedback insights will appear once responses are collected.",
+    chartTitle: __("Feedback Trend"),
+    title: __("No feedback data"),
+    message: __("Feedback insights will appear once responses are collected."),
   },
   tickets_by_team: {
-    chartTitle: "Tickets by Team",
-    title: "No team data",
-    message: "Tickets will be grouped by team once available.",
+    chartTitle: __("Tickets by Team"),
+    title: __("No team data"),
+    message: __("Tickets will be grouped by team once available."),
   },
   tickets_by_type: {
-    chartTitle: "Tickets by Type",
-    title: "No ticket type data",
-    message: "Tickets will be categorized by type once created.",
+    chartTitle: __("Tickets by Type"),
+    title: __("No ticket type data"),
+    message: __("Tickets will be categorized by type once created."),
   },
   tickets_by_priority: {
-    chartTitle: "Tickets by Priority",
-    title: "No priority data",
-    message: "Ticket priorities will be reflected here once assigned.",
+    chartTitle: __("Tickets by Priority"),
+    title: __("No priority data"),
+    message: __("Ticket priorities will be reflected here once assigned."),
   },
   tickets_by_channel: {
-    chartTitle: "Tickets by Channel",
-    title: "No channel data",
-    message: "Tickets will be grouped by channel once received.",
+    chartTitle: __("Tickets by Channel"),
+    title: __("No channel data"),
+    message: __("Tickets will be grouped by channel once received."),
   },
   top_tags: {
-    chartTitle: "Top Tags",
-    title: "No tags used yet",
-    message: "The most used tags will be ranked here once tickets are tagged.",
+    chartTitle: __("Top Tags"),
+    title: __("No tags used yet"),
+    message: __(
+      "The most used tags will be ranked here once tickets are tagged."
+    ),
   },
   tag_trend: {
-    chartTitle: "Tag Trend",
-    title: "No tag activity",
-    message: "Daily tag volume will appear here once tickets are tagged.",
+    chartTitle: __("Tag Trend"),
+    title: __("No tag activity"),
+    message: __("Daily tag volume will appear here once tickets are tagged."),
   },
 };
 
@@ -332,7 +334,7 @@ const emptyStates = computed(() =>
 
 function chartEmptyState(chart: any) {
   const state = emptyStateByChart[chart?.key] ?? {
-    title: `No ${String(chart?.title).toLowerCase()} available`,
+    title: __("No {0} available", [String(chart?.title).toLowerCase()]),
   };
   return [
     { ...state, chartTitle: chart?.title, chartSubtitle: chart?.subtitle },
@@ -590,12 +592,12 @@ function formatter(range: string) {
     return preset.value;
   }
   let [from, to] = range.split(",");
-  return `${formatRange(from)} to ${formatRange(to)}`;
+  return __("{0} to {1}", [formatRange(from), formatRange(to)]);
 }
 
 function formatRange(date: string) {
   const dateObj = new Date(date);
-  return dateObj.toLocaleDateString("en-US", {
+  return dateObj.toLocaleDateString((window as any).lang || "en-US", {
     month: "short",
     day: "numeric",
     year:
