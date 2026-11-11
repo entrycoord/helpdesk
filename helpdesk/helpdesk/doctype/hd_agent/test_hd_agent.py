@@ -67,6 +67,31 @@ class TestHDAgent(FrappeTestCase):
         finally:
             frappe.flags.in_test = True
 
+    # "Manager" is the Agent Manager role; it must not make the agent a site admin
+    def test_manager_promotion_does_not_grant_system_manager(self):
+        user = make_agent("promote_manager@test.com", first_name="Promote Manager")
+
+        update_agent_role(user, "Manager")
+
+        roles = set(frappe.get_roles(user))
+        self.assertIn("Agent", roles)
+        self.assertIn("Agent Manager", roles)
+        self.assertNotIn("System Manager", roles)
+
+    # demoting in Helpdesk leaves site-wide admin rights to Desk user management
+    def test_demotion_keeps_system_manager(self):
+        user = make_agent("demote_admin@test.com", first_name="Demote Admin")
+        user_doc = frappe.get_doc("User", user)
+        user_doc.append_roles("Agent Manager", "System Manager")
+        user_doc.save()
+
+        update_agent_role(user, "Agent")
+
+        roles = set(frappe.get_roles(user))
+        self.assertIn("Agent", roles)
+        self.assertNotIn("Agent Manager", roles)
+        self.assertIn("System Manager", roles)
+
     # saving an HD Agent grants its user the Agent role, so only managers may create one
     def test_agent_cannot_make_another_user_an_agent(self):
         user = create_user("not_an_agent@test.com").name

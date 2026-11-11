@@ -129,11 +129,13 @@ def update_agent_role(user: str, new_role: str):
 
     user_doc = frappe.get_doc("User", user)
 
+    # System Manager is a site-wide admin role, never a Helpdesk role: it is
+    # neither granted nor taken away here (Desk user management owns it)
     if new_role == "Manager":
-        user_doc.append_roles("Agent Manager", "System Manager")
+        user_doc.append_roles("Agent", "Agent Manager")
     if new_role == "Agent":
         user_doc.append_roles("Agent")
         if "Agent Manager" in frappe.get_roles(user_doc.name):
-            user_doc.remove_roles("Agent Manager", "System Manager")
+            user_doc.remove_roles("Agent Manager")
 
     user_doc.save()
