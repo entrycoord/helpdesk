@@ -1,0 +1,85 @@
+<!-- Adapted from Frappe framework UI Onboarding; see FRAPPE-MIT-LICENSE. -->
+<template>
+  <div
+    v-if="!isSidebarCollapsed"
+    class="flex flex-col gap-3 shadow-sm rounded-6 py-2.5 px-3 bg-surface-elevation-2 text-base"
+  >
+    <div
+      v-if="stepsCompleted != totalSteps"
+      class="inline-flex text-ink-gray-9 gap-2"
+    >
+      <StepsIcon class="h-4 my-0.5 shrink-0" />
+      <div class="flex flex-col text-p-sm gap-0.5">
+        <div class="font-medium">
+          {{ __("Getting started") }}
+        </div>
+        <div class="text-ink-gray-7">
+          {{ __("{0}/{1} steps", stepsCompleted, totalSteps) }}
+        </div>
+      </div>
+    </div>
+    <div v-else class="flex flex-col gap-1">
+      <div class="flex items-center justify-between gap-1">
+        <div class="flex items-center gap-2 shrink-0">
+          <StepsIcon class="h-4 my-0.5" />
+          <div class="text-ink-gray-9 font-medium">
+            {{ __("You are all set") }}
+          </div>
+        </div>
+        <LucideX class="size-4 cursor-pointer" @click="dismiss" />
+      </div>
+      <div class="text-p-sm text-ink-gray-7">
+        {{ __("All steps are completed successfully") }}
+      </div>
+    </div>
+    <Button
+      v-if="stepsCompleted != totalSteps"
+      :label="stepsCompleted == 0 ? __('Start now') : __('Continue')"
+      theme="blue"
+      @click="openOnboarding"
+    >
+      <template #prefix>
+        <LucideChevronsRight class="size-4" />
+      </template>
+    </Button>
+  </div>
+  <Button
+    v-else-if="stepsCompleted != totalSteps"
+    :aria-label="__('Getting started')"
+    @click="openOnboarding"
+  >
+    <StepsIcon class="h-4 my-0.5 shrink-0" />
+  </Button>
+</template>
+<script setup lang="ts">
+import { __ } from "@/translation";
+import { Button } from "frappe-ui";
+import LucideChevronsRight from "~icons/lucide/chevrons-right";
+import LucideX from "~icons/lucide/x";
+import { StepsIcon } from "frappe-ui/icons";
+import { useOnboarding } from "@framework/ui";
+import { showHelpCenter } from "./helpCenter";
+import { minimize, showHelpModal } from "@framework/ui";
+import type { GettingStartedBannerProps } from "./types";
+
+const props = withDefaults(defineProps<GettingStartedBannerProps>(), {
+  isSidebarCollapsed: false,
+  appName: "frappecrm",
+});
+
+// `useOnboarding` returns undefined for guests, and this banner is only
+// rendered for signed-in users, so the non-null assertion is the call site's
+// existing contract rather than a new one.
+const { stepsCompleted, totalSteps, isOnboardingStepsCompleted } =
+  useOnboarding(props.appName)!;
+
+function dismiss() {
+  showHelpCenter.value = true;
+  isOnboardingStepsCompleted.value = true;
+}
+
+const openOnboarding = () => {
+  minimize.value = false;
+  showHelpModal.value = true;
+};
+</script>

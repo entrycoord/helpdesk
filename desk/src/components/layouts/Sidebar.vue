@@ -88,15 +88,15 @@ import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
-  GettingStartedBanner,
-  HelpModal,
-  IntermediateStepModal,
   minimize,
   showHelpModal,
   TrialBanner,
   useOnboarding,
 } from "@framework/ui";
 
+import GettingStartedBanner from "@/components/onboarding/GettingStartedBanner.vue";
+import HelpModal from "@/components/onboarding/HelpModal.vue";
+import IntermediateStepModal from "@/components/onboarding/IntermediateStepModal.vue";
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";

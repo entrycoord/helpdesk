@@ -1,0 +1,157 @@
+<!-- Adapted from Frappe framework UI Onboarding; see FRAPPE-MIT-LICENSE. -->
+<template>
+  <div
+    v-show="show"
+    class="fixed z-50 right-0 w-80 h-[calc(100%_-_80px)] text-ink-gray-9 m-5 mt-[62px] p-3 flex gap-2 flex-col justify-between rounded-6 bg-surface-elevation-2 shadow-2xl"
+    :class="{ 'top-[calc(100%_-_120px)] border': minimize }"
+    @click.stop
+  >
+    <div class="flex items-center justify-between px-2 py-1.5">
+      <div class="text-base font-medium">
+        {{ headingTitle }}
+      </div>
+      <div class="flex gap-1">
+        <Dropdown v-if="options.length" :options="options">
+          <Button
+            variant="ghost"
+            icon="lucide-ellipsis"
+            :aria-label="__('More options')"
+          />
+        </Dropdown>
+        <Button
+          @click="toggleMinimize"
+          variant="ghost"
+          :aria-label="minimize ? __('Maximize') : __('Minimize')"
+        >
+          <component
+            :is="minimize ? MaximizeIcon : MinimizeIcon"
+            class="h-3.5"
+          />
+        </Button>
+        <Button variant="ghost" :aria-label="__('Close')" @click="show = false">
+          <LucideX class="size-3.5" />
+        </Button>
+      </div>
+    </div>
+    <div class="h-full overflow-hidden flex flex-col">
+      <OnboardingSteps
+        v-if="!isOnboardingStepsCompleted && !showHelpCenter"
+        :title="title"
+        :logo="logo"
+        :afterSkip="afterSkip"
+        :afterSkipAll="afterSkipAll"
+        :afterReset="afterReset"
+        :afterResetAll="afterResetAll"
+        :appName="appName"
+      />
+      <HelpCenter
+        v-else-if="showHelpCenter"
+        v-model="articles"
+        :docsLink="docsLink"
+      />
+    </div>
+    <div v-for="item in footerItems" class="flex flex-col gap-1.5">
+      <div
+        class="w-full flex gap-2 items-center hover:bg-surface-gray-1 text-ink-gray-8 rounded-4 px-2 py-1.5 cursor-pointer"
+        @click="item.onClick"
+      >
+        <component :is="item.icon" class="h-4" />
+        <div class="text-base">{{ item.label }}</div>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { __ } from "@/translation";
+import { Button, Dropdown } from "frappe-ui";
+import LucideX from "~icons/lucide/x";
+import {
+  HelpIcon,
+  MaximizeIcon,
+  MinimizeIcon,
+  StepsIcon,
+} from "frappe-ui/icons";
+import OnboardingSteps from "./OnboardingSteps.vue";
+import HelpCenter from "./HelpCenter.vue";
+import { useOnboarding } from "@framework/ui";
+import { showHelpCenter } from "./helpCenter";
+import { minimize } from "@framework/ui";
+import { computed, watch } from "vue";
+import type { HelpArticle, HelpModalProps } from "./types";
+
+const props = withDefaults(defineProps<HelpModalProps>(), {
+  appName: "frappecrm",
+  title: "Frappe CRM",
+  docsLink: "https://docs.frappe.io/crm",
+});
+
+const { syncStatus, resetAll, isOnboardingStepsCompleted } = useOnboarding(
+  props.appName
+)!;
+
+const show = defineModel<boolean>();
+const articles = defineModel<HelpArticle[]>("articles", {
+  default: () => [],
+});
+
+const headingTitle = computed(() => {
+  if (!isOnboardingStepsCompleted.value && !showHelpCenter.value) {
+    return __("Getting started");
+  } else if (showHelpCenter.value) {
+    return __("Help center");
+  }
+});
+
+const options = computed(() => {
+  let items = [
+    {
+      icon: StepsIcon,
+      label: __("Reset onboarding steps"),
+      onClick: resetOnboardingSteps,
+      condition: () => showHelpCenter.value && isOnboardingStepsCompleted.value,
+    },
+  ];
+
+  return items.filter((item) => item.condition());
+});
+
+const footerItems = computed(() => {
+  let items = [
+    {
+      icon: HelpIcon,
+      label: __("Help centre"),
+      onClick: () => {
+        syncStatus();
+        showHelpCenter.value = true;
+      },
+      condition: !isOnboardingStepsCompleted.value && !showHelpCenter.value,
+    },
+    {
+      icon: StepsIcon,
+      label: __("Getting started"),
+      onClick: () => (showHelpCenter.value = false),
+      condition: showHelpCenter.value && !isOnboardingStepsCompleted.value,
+    },
+  ];
+
+  return items.filter((item) => item.condition);
+});
+
+function toggleMinimize() {
+  minimize.value = !minimize.value;
+}
+
+function resetOnboardingSteps() {
+  resetAll();
+  isOnboardingStepsCompleted.value = false;
+  showHelpCenter.value = false;
+}
+
+watch(
+  isOnboardingStepsCompleted,
+  (completed) => {
+    if (completed) showHelpCenter.value = true;
+  },
+  { immediate: true }
+);
+</script>
