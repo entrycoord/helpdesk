@@ -29,9 +29,47 @@
             <CommentIcon class="h-4" />
           </template>
         </Button>
+        <Button
+          v-if="authStore.isMaintainer"
+          variant="ghost"
+          :label="isMobileView ? __('Note') : __('Add note')"
+          :aria-label="__('Add note')"
+          :class="
+            showNoteBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : ''
+          "
+          @click="showNoteBox = !showNoteBox"
+        >
+          <template #prefix><LucideLock class="h-4" /></template>
+        </Button>
         <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
+    <Transition name="slide">
+      <div
+        v-if="authStore.isMaintainer"
+        v-show="showNoteBox"
+        @keydown.ctrl.enter.capture.stop="noteEditorRef?.submit()"
+        @keydown.meta.enter.capture.stop="noteEditorRef?.submit()"
+        @keydown.esc.capture.stop="showNoteBox = false"
+      >
+        <div class="overflow-hidden">
+          <MaintainerNoteEditor
+            ref="noteEditorRef"
+            :ticket-id="ticketId"
+            :label="
+              isMobileView
+                ? __('Add note')
+                : isMac
+                ? __('Add note (⌘ + ⏎)')
+                : __('Add note (Ctrl + ⏎)')
+            "
+            :placeholder="__('@John could you please look into this?')"
+            @submit="showNoteBox = false"
+            @discard="showNoteBox = false"
+          />
+        </div>
+      </div>
+    </Transition>
     <Transition name="slide">
       <div
         v-show="showEmailBox"
@@ -123,14 +161,19 @@
 <script setup lang="ts">
 import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
+import MaintainerNoteEditor from "@/components/ticket-agent/maintainer-notes/MaintainerNoteEditor.vue";
+import { useAuthStore } from "@/stores/auth";
+import { isContentEmpty } from "@/utils";
+import LucideLock from "~icons/lucide/lock";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { onClickOutside } from "@vueuse/core";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(["update", "open-maintainer-notes"]);
+const authStore = useAuthStore();
 const content = defineModel("content");
 const { isMac } = useDevice();
 const { isMobileView } = useScreenSize();
@@ -140,6 +183,10 @@ const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
 const emailBoxRef = ref(null);
 const commentBoxRef = ref(null);
+const noteEditorRef = ref<InstanceType<typeof MaintainerNoteEditor> | null>(
+  null
+);
+const showNoteBox = ref(false);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -206,10 +253,34 @@ const props = defineProps({
   },
 });
 
+watch(showNoteBox, async (open) => {
+  if (!open) return;
+  showEmailBox.value = false;
+  showCommentBox.value = false;
+  emit("open-maintainer-notes");
+  await nextTick();
+  noteEditorRef.value?.focus();
+});
+
+watch(
+  () => props.ticketId,
+  (ticketId) => {
+    showNoteBox.value = Boolean(
+      authStore.isMaintainer &&
+        ticketId &&
+        !isContentEmpty(
+          localStorage.getItem("maintainerNoteContent" + ticketId) ?? ""
+        )
+    );
+  },
+  { immediate: true }
+);
+
 watch(
   () => showEmailBox.value,
   (value) => {
     if (value) {
+      showNoteBox.value = false;
       emailEditorRef.value?.editor?.commands?.focus("start");
     }
   }
@@ -219,6 +290,7 @@ watch(
   () => showCommentBox.value,
   (value) => {
     if (value) {
+      showNoteBox.value = false;
       commentTextEditorRef.value?.editor?.commands?.focus();
     }
   }

@@ -1,55 +1,58 @@
 <template>
-  <Tabs
-    :modelValue="activeTab"
-    @update:modelValue="changeTabTo"
-    class="flex flex-1 flex-col overflow-hidden"
+  <!-- one notes instance per ticket, for the notes tab and the composer -->
+  <MaintainerNotesProvider
+    :key="String(ticket.doc?.name)"
+    :ticket-id="String(ticket.doc?.name)"
   >
-    <!-- the row carries the underline so it runs beneath the actions too -->
-    <div
-      class="flex shrink-0 items-center gap-2 border-b border-outline-gray-1 px-5"
+    <Tabs
+      :modelValue="activeTab"
+      @update:modelValue="changeTabTo"
+      class="flex flex-1 flex-col overflow-hidden"
     >
-      <TabList size="md" class="flex-1 !border-b-0 py-1.5">
-        <TabTrigger
-          v-for="tab in tabs"
-          :key="tab.value"
-          :value="tab.value"
-          :label="tab.label"
-          :icon-left="tab.iconLeft"
+      <!-- the row carries the underline so it runs beneath the actions too -->
+      <div
+        class="flex shrink-0 items-center gap-2 border-b border-outline-gray-1 px-5"
+      >
+        <TabList size="md" class="flex-1 !border-b-0 py-1.5">
+          <TabTrigger
+            v-for="tab in tabs"
+            :key="tab.value"
+            :value="tab.value"
+            :label="tab.label"
+            :icon-left="tab.iconLeft"
+          />
+        </TabList>
+        <TicketCallActions v-if="activeTab === 'call'" />
+      </div>
+      <TabPanel
+        v-for="tab in tabs"
+        :key="tab.value"
+        :value="tab.value"
+        class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
+      >
+        <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
+        <MaintainerNotes v-else-if="tab.value === 'maintainer-notes'" />
+        <TicketTimeline
+          v-else
+          :ticket-id="String(ticket.doc?.name)"
+          :tab="tab.value"
+          :tab-label="tab.label"
+          @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
         />
-      </TabList>
-      <TicketCallActions v-if="activeTab === 'call'" />
-    </div>
-    <TabPanel
-      v-for="tab in tabs"
-      :key="tab.value"
-      :value="tab.value"
-      class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
-    >
-      <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
-      <MaintainerNotes
-        v-else-if="tab.value === 'maintainer-notes'"
-        :key="String(ticket.doc?.name)"
-        :ticket-id="String(ticket.doc?.name)"
-      />
-      <TicketTimeline
-        v-else
-        :ticket-id="String(ticket.doc?.name)"
-        :tab="tab.value"
-        :tab-label="tab.label"
-        @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
-      />
-    </TabPanel>
-  </Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-    @update="reloadTicketFeed(String(ticket.doc?.name))"
-  />
+      </TabPanel>
+    </Tabs>
+    <!-- Comm Area -->
+    <CommunicationArea
+      ref="communicationAreaRef"
+      :ticketId="String(ticket.doc?.name)"
+      :to-emails="[ticket.doc?.raised_by]"
+      :cc-emails="[]"
+      :bcc-emails="[]"
+      :key="ticket.doc?.name"
+      @update="reloadTicketFeed(String(ticket.doc?.name))"
+      @open-maintainer-notes="changeTabTo('maintainer-notes')"
+    />
+  </MaintainerNotesProvider>
 </template>
 
 <script setup lang="ts">
@@ -62,6 +65,7 @@ import {
 } from "@/components/icons";
 import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
 import MaintainerNotes from "@/components/ticket-agent/maintainer-notes/MaintainerNotes.vue";
+import MaintainerNotesProvider from "@/components/ticket-agent/maintainer-notes/MaintainerNotesProvider.vue";
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { reloadTicketFeed } from "@/composables/useTicket";

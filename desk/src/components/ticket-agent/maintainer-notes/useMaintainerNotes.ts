@@ -1,10 +1,10 @@
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { createResource, toast } from "frappe-ui";
-import { computed, onScopeDispose, type InjectionKey } from "vue";
+import { computed, inject, onScopeDispose, ref, type InjectionKey } from "vue";
 
 const API = "helpdesk.api.maintainer_note";
-export const MAINTAINER_NOTE_EVENT = "helpdesk:maintainer-note-update";
+const MAINTAINER_NOTE_EVENT = "helpdesk:maintainer-note-update";
 
 export interface MaintainerNoteAttachment {
   name: string;
@@ -42,6 +42,10 @@ function serverMessage(error: unknown, fallback: string): string {
  * Maintainer-only notes of one ticket. Nothing here reaches client staff:
  * every call is checked server-side, and the realtime event carries no content,
  * only a hint to refetch.
+ *
+ * Call it once per ticket (MaintainerNotesProvider does) and share the result
+ * through MaintainerNotesKey: the timeline and the composer are far apart in
+ * the tree and must see the same list, one fetch and one socket listener.
  */
 export function useMaintainerNotes(ticketId: string) {
   const { $socket } = globalStore();
@@ -73,6 +77,11 @@ export function useMaintainerNotes(ticketId: string) {
 
   const list = computed<MaintainerNote[]>(() => notes.data ?? []);
 
+  // Set once a note of ours is saved and in the list; the timeline consumes it
+  // (scrolls to the newest note) as soon as it is on screen, which may be later
+  // than the save when another tab was active.
+  const scrollPending = ref(false);
+
   // resolves false on failure; the resource's onError already told the user
   async function run(action: () => Promise<unknown>): Promise<boolean> {
     try {
@@ -85,10 +94,12 @@ export function useMaintainerNotes(ticketId: string) {
     return true;
   }
 
-  function addNote(content: string, attachments: object[] = []) {
-    return run(() =>
+  async function addNote(content: string, attachments: object[] = []) {
+    const ok = await run(() =>
       addResource.submit({ ticket: ticketId, content, attachments })
     );
+    if (ok) scrollPending.value = true;
+    return ok;
   }
 
   function editNote(name: string, content: string) {
@@ -110,6 +121,7 @@ export function useMaintainerNotes(ticketId: string) {
     notes: list,
     loading: computed<boolean>(() => notes.loading),
     adding: computed<boolean>(() => addResource.loading),
+    scrollPending,
     reload: () => notes.reload(),
     addNote,
     editNote,
@@ -119,8 +131,16 @@ export function useMaintainerNotes(ticketId: string) {
 
 export type MaintainerNotesApi = ReturnType<typeof useMaintainerNotes>;
 
-export const MaintainerNotesKey: InjectionKey<MaintainerNotesApi> =
+/** null for everyone but maintainers: they never fetch or listen. */
+export const MaintainerNotesKey: InjectionKey<MaintainerNotesApi | null> =
   Symbol("maintainerNotes");
+
+/** The ticket's shared notes; only call it where a maintainer sees the UI. */
+export function injectMaintainerNotes(): MaintainerNotesApi {
+  const api = inject(MaintainerNotesKey, null);
+  if (!api) throw new Error("MaintainerNotesProvider is missing");
+  return api;
+}
 
 /** Mention suggestions: maintainers only, so a note never pings client staff. */
 export function useMaintainerMentions() {

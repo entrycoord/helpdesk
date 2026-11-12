@@ -92,9 +92,9 @@ import {
   EditorFixedMenu,
   EditorTableMenu,
 } from "frappe-ui/editor";
-import { computed, inject, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import {
-  MaintainerNotesKey,
+  injectMaintainerNotes,
   useMaintainerMentions,
 } from "./useMaintainerNotes";
 
@@ -111,7 +111,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ submit: []; discard: [] }>();
 
-const notesApi = inject(MaintainerNotesKey)!;
+const notesApi = injectMaintainerNotes();
 
 // its own draft key: a note draft must never surface in the comment box
 const draftKey = "maintainerNoteContent" + props.ticketId;

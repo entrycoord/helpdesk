@@ -24,7 +24,11 @@
           </Tooltip>
           <!-- -me-1.5 matches the tighter edge the framework gives a header with actions -->
           <div v-if="options.length && !editing" class="-me-1.5">
-            <Dropdown align="end" :options="options">
+            <Dropdown
+              align="end"
+              :options="options"
+              @update:open="(open) => open && (isConfirmingDelete = false)"
+            >
               <Button
                 icon="lucide-more-horizontal"
                 class="text-ink-gray-5"
@@ -40,16 +44,18 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
-import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
-import { isContentEmpty } from "@/utils";
+import { ConfirmDelete, isContentEmpty } from "@/utils";
 import {
   CommentItem,
   type CommentActivity,
 } from "@framework/ui/ActivityTimeline";
 import { Button, Dropdown, Tooltip, dayjsLocal, toast } from "frappe-ui";
-import { computed, inject, ref } from "vue";
-import { MaintainerNotesKey, type MaintainerNote } from "./useMaintainerNotes";
+import { computed, ref } from "vue";
+import {
+  injectMaintainerNotes,
+  type MaintainerNote,
+} from "./useMaintainerNotes";
 
 // same as the framework's timeline, so every row's time reads alike
 const TOOLTIP_DATE_FORMAT = "ddd, MMM D, YYYY h:mm A";
@@ -60,10 +66,10 @@ const props = defineProps<{
 }>();
 
 const authStore = useAuthStore();
-const { $dialog } = globalStore();
-const notesApi = inject(MaintainerNotesKey)!;
+const notesApi = injectMaintainerNotes();
 
 const editing = ref(false);
+const isConfirmingDelete = ref(false);
 
 const postedAt = computed(() => dayjsLocal(props.note.creation));
 const editedAt = computed(() =>
@@ -84,13 +90,10 @@ const options = computed(() => [
       ]
     : []),
   ...(props.note.can_edit
-    ? [
-        {
-          label: __("Delete"),
-          icon: "lucide-trash-2",
-          onClick: confirmDelete,
-        },
-      ]
+    ? ConfirmDelete({
+        isConfirmingDelete,
+        onConfirmDelete: () => notesApi.deleteNote(props.note.name),
+      })
     : []),
 ]);
 
@@ -101,24 +104,5 @@ async function save(content: string) {
   }
   // stays in edit mode on failure, so the text is not lost
   if (await notesApi.editNote(props.note.name, content)) editing.value = false;
-}
-
-function confirmDelete() {
-  $dialog({
-    title: __("Delete note"),
-    message: __("Are you sure you want to delete this note?"),
-    actions: [
-      {
-        label: __("Delete"),
-        theme: "red",
-        iconLeft: "lucide-trash-2",
-        variant: "solid",
-        onClick({ close }: { close: () => void }) {
-          notesApi.deleteNote(props.note.name);
-          close();
-        },
-      },
-    ],
-  });
 }
 </script>

@@ -87,122 +87,123 @@
       class="flex min-h-0 flex-1 overflow-x-hidden"
     >
       <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden">
-        <div class="flex min-h-0 flex-1 flex-col">
-          <Tabs
-            :modelValue="activeTab"
-            @update:modelValue="changeTabTo"
-            class="flex flex-col flex-1 overflow-hidden"
-          >
-            <div class="flex shrink-0">
-              <!-- Scroll here so the active underline isn't clipped. -->
-              <div class="min-w-0 flex-1 overflow-x-auto hide-scrollbar">
-                <TabList size="md" class="w-max min-w-full px-3 py-1.5">
-                  <TabTrigger
-                    v-for="tab in visibleTabs"
-                    :key="tab.value"
-                    :value="tab.value"
-                    :label="tab.label"
-                    :icon-left="tab.iconLeft"
-                  />
-                </TabList>
-              </div>
-              <!-- own border, so the tab underline runs on beneath it -->
-              <div
-                v-if="activeTab === 'call'"
-                class="flex items-center border-b border-outline-gray-1 pe-3"
-              >
-                <TicketCallActions />
-              </div>
-            </div>
-            <TabPanel
-              v-for="tab in visibleTabs"
-              :key="tab.value"
-              :value="tab.value"
-              class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
+        <!-- one notes instance per ticket, for the notes tab and the composer -->
+        <MaintainerNotesProvider :ticket-id="String(ticket.doc?.name)">
+          <div class="flex min-h-0 flex-1 flex-col">
+            <Tabs
+              :modelValue="activeTab"
+              @update:modelValue="changeTabTo"
+              class="flex flex-col flex-1 overflow-hidden"
             >
-              <div v-if="tab.value === 'details'">
-                <!-- ticket contact info -->
-                <TicketAgentContact
-                  v-if="contact.data"
-                  :contact="contact.data"
-                  :ticketId="ticket.doc?.name"
-                  @email:open="communicationAreaRef.toggleEmailBox()"
-                />
-                <!-- feedback component -->
-                <TicketFeedback
-                  v-if="ticket.doc?.feedback_rating"
-                  class="border-b px-6 py-3 text-base text-gray-600"
-                  :ticket="ticket.doc"
-                />
-                <!-- SLA Section, hidden when no policy is attached -->
-                <template v-if="ticket.doc?.sla">
-                  <h3 class="px-6 pt-3 text-base-semibold">
-                    {{ __("SLA") }}
-                  </h3>
-                  <div class="px-6 py-3">
-                    <TicketSLA />
-                  </div>
-                </template>
-                <div
-                  class="flex items-center border-b px-6 py-3 text-base leading-5"
-                >
-                  <div class="w-[126px] text-sm text-ink-gray-5">
-                    {{ __("Source") }}
-                  </div>
-                  <div>
-                    {{
-                      ticket.doc?.via_customer_portal
-                        ? __("Portal")
-                        : __("Mail")
-                    }}
-                  </div>
+              <div class="flex shrink-0">
+                <!-- Scroll here so the active underline isn't clipped. -->
+                <div class="min-w-0 flex-1 overflow-x-auto hide-scrollbar">
+                  <TabList size="md" class="w-max min-w-full px-3 py-1.5">
+                    <TabTrigger
+                      v-for="tab in visibleTabs"
+                      :key="tab.value"
+                      :value="tab.value"
+                      :label="tab.label"
+                      :icon-left="tab.iconLeft"
+                    />
+                  </TabList>
                 </div>
-                <!-- Ticket Fields -->
-                <h3 class="px-6 pt-3 text-base-semibold">
-                  {{ __("Details") }}
-                </h3>
-                <TicketAgentFields
-                  :ticket="ticketWithFields"
-                  @update="
-                    ({ field, value }) =>
-                      ticket.setValue.submit({ [field]: value })
-                  "
-                  class="!border-0"
-                />
+                <!-- own border, so the tab underline runs on beneath it -->
+                <div
+                  v-if="activeTab === 'call'"
+                  class="flex items-center border-b border-outline-gray-1 pe-3"
+                >
+                  <TicketCallActions />
+                </div>
               </div>
+              <TabPanel
+                v-for="tab in visibleTabs"
+                :key="tab.value"
+                :value="tab.value"
+                class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
+              >
+                <div v-if="tab.value === 'details'">
+                  <!-- ticket contact info -->
+                  <TicketAgentContact
+                    v-if="contact.data"
+                    :contact="contact.data"
+                    :ticketId="ticket.doc?.name"
+                    @email:open="communicationAreaRef.toggleEmailBox()"
+                  />
+                  <!-- feedback component -->
+                  <TicketFeedback
+                    v-if="ticket.doc?.feedback_rating"
+                    class="border-b px-6 py-3 text-base text-gray-600"
+                    :ticket="ticket.doc"
+                  />
+                  <!-- SLA Section, hidden when no policy is attached -->
+                  <template v-if="ticket.doc?.sla">
+                    <h3 class="px-6 pt-3 text-base-semibold">
+                      {{ __("SLA") }}
+                    </h3>
+                    <div class="px-6 py-3">
+                      <TicketSLA />
+                    </div>
+                  </template>
+                  <div
+                    class="flex items-center border-b px-6 py-3 text-base leading-5"
+                  >
+                    <div class="w-[126px] text-sm text-ink-gray-5">
+                      {{ __("Source") }}
+                    </div>
+                    <div>
+                      {{
+                        ticket.doc?.via_customer_portal
+                          ? __("Portal")
+                          : __("Mail")
+                      }}
+                    </div>
+                  </div>
+                  <!-- Ticket Fields -->
+                  <h3 class="px-6 pt-3 text-base-semibold">
+                    {{ __("Details") }}
+                  </h3>
+                  <TicketAgentFields
+                    :ticket="ticketWithFields"
+                    @update="
+                      ({ field, value }) =>
+                        ticket.setValue.submit({ [field]: value })
+                    "
+                    class="!border-0"
+                  />
+                </div>
 
-              <MaintainerNotes
-                v-else-if="tab.value === 'maintainer-notes'"
-                :ticket-id="String(ticket.doc?.name)"
-              />
-              <!-- Rest Activities -->
-              <TicketTimeline
-                v-else
-                ref="timelineRef"
-                :ticket-id="String(ticket.doc?.name)"
-                :tab="tab.value"
-                :tab-label="tab.label"
-                @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
-              />
-            </TabPanel>
-          </Tabs>
-          <CommunicationArea
-            class="bg-surface-base"
-            ref="communicationAreaRef"
-            v-model="ticket.doc"
-            :ticketId="ticket.doc?.name"
-            :to-emails="[ticket.doc.raised_by]"
-            :cc-emails="[]"
-            :bcc-emails="[]"
-            :key="ticket.doc?.name"
-            @update="
-              () => {
-                reloadTicket(props.ticketId);
-                timelineRef[0]?.reload();
-              }
-            "
-          />
-        </div>
+                <MaintainerNotes v-else-if="tab.value === 'maintainer-notes'" />
+                <!-- Rest Activities -->
+                <TicketTimeline
+                  v-else
+                  ref="timelineRef"
+                  :ticket-id="String(ticket.doc?.name)"
+                  :tab="tab.value"
+                  :tab-label="tab.label"
+                  @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
+                />
+              </TabPanel>
+            </Tabs>
+            <CommunicationArea
+              class="bg-surface-base"
+              ref="communicationAreaRef"
+              v-model="ticket.doc"
+              :ticketId="ticket.doc?.name"
+              @open-maintainer-notes="changeTabTo('maintainer-notes')"
+              :to-emails="[ticket.doc.raised_by]"
+              :cc-emails="[]"
+              :bcc-emails="[]"
+              :key="ticket.doc?.name"
+              @update="
+                () => {
+                  reloadTicket(props.ticketId);
+                  timelineRef[0]?.reload();
+                }
+              "
+            />
+          </div>
+        </MaintainerNotesProvider>
       </div>
     </div>
 
@@ -290,6 +291,7 @@ import {
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 import MaintainerNotes from "@/components/ticket-agent/maintainer-notes/MaintainerNotes.vue";
+import MaintainerNotesProvider from "@/components/ticket-agent/maintainer-notes/MaintainerNotesProvider.vue";
 
 import CustomActions from "@/components/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";

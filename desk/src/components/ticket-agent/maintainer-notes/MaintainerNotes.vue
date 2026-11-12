@@ -33,82 +33,40 @@
         </template>
       </ActivityTimeline>
     </TimelineContainer>
-    <!-- the note composer; the ticket's reply/comment area stays below the tabs -->
-    <div class="shrink-0 border-t border-outline-gray-1">
-      <div v-show="!showEditor" class="px-6 py-4 md:px-5 md:py-2.5">
-        <Button variant="ghost" :label="__('Add note')" @click="openEditor()">
-          <template #prefix>
-            <LucideLock class="h-4" />
-          </template>
-        </Button>
-      </div>
-      <!-- v-show keeps the editor alive, so it can take focus at once -->
-      <div
-        v-show="showEditor"
-        @keydown.ctrl.enter.capture.stop="editorRef?.submit()"
-        @keydown.meta.enter.capture.stop="editorRef?.submit()"
-        @keydown.esc.capture.stop="showEditor = false"
-      >
-        <MaintainerNoteEditor
-          ref="editorRef"
-          :ticket-id="ticketId"
-          :label="
-            isMobileView
-              ? __('Add note')
-              : isMac
-              ? __('Add note (⌘ + ⏎)')
-              : __('Add note (Ctrl + ⏎)')
-          "
-          :placeholder="__('@John could you please look into this?')"
-          @submit="onSubmitted"
-          @discard="showEditor = false"
-        />
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useDevice } from "@/composables";
-import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
-import { isContentEmpty } from "@/utils";
 import {
   ActivityTimeline,
   TimelineContainer,
   type CommentActivity,
 } from "@framework/ui/ActivityTimeline";
-import { Button } from "frappe-ui";
-import { computed, nextTick, provide, ref, useTemplateRef } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import LucideLock from "~icons/lucide/lock";
-import MaintainerNoteEditor from "./MaintainerNoteEditor.vue";
 import MaintainerNoteItem from "./MaintainerNoteItem.vue";
 import {
-  MaintainerNotesKey,
-  useMaintainerNotes,
+  injectMaintainerNotes,
   type MaintainerNote,
 } from "./useMaintainerNotes";
 
-const props = defineProps<{ ticketId: string }>();
+// the ticket's shared instance, also used by the composer in CommunicationArea
+const { notes, loading, scrollPending } = injectMaintainerNotes();
 
-const { isMac } = useDevice();
-const { isMobileView } = useScreenSize();
+const timelineRef = ref<InstanceType<typeof ActivityTimeline> | null>(null);
 
-const notesApi = useMaintainerNotes(props.ticketId);
-provide(MaintainerNotesKey, notesApi);
-const { notes, loading } = notesApi;
-
-const timelineRef =
-  useTemplateRef<InstanceType<typeof ActivityTimeline>>("timelineRef");
-const editorRef =
-  useTemplateRef<InstanceType<typeof MaintainerNoteEditor>>("editorRef");
-
-// a draft left from last time reopens the composer
-const showEditor = ref(
-  !isContentEmpty(
-    localStorage.getItem("maintainerNoteContent" + props.ticketId) ?? ""
-  )
-);
+// after saving a note the newest row belongs on screen (old feed parity); when
+// the save happened while another tab was active, this runs on first display
+async function scrollToNewNote() {
+  if (!scrollPending.value) return;
+  await nextTick();
+  if (!timelineRef.value) return;
+  timelineRef.value.scrollToLatest();
+  scrollPending.value = false;
+}
+watch(scrollPending, scrollToNewNote);
+onMounted(scrollToNewNote);
 
 const noteByName = computed(
   () => new Map<string, MaintainerNote>(notes.value.map((n) => [n.name, n]))
@@ -137,16 +95,4 @@ const activities = computed<CommentActivity[]>(() =>
     })
   )
 );
-
-async function openEditor() {
-  showEditor.value = true;
-  await nextTick();
-  editorRef.value?.focus();
-}
-
-async function onSubmitted() {
-  showEditor.value = false;
-  await nextTick();
-  timelineRef.value?.scrollToLatest();
-}
 </script>
