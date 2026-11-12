@@ -1,4 +1,5 @@
 import { call, createListResource } from "frappe-ui";
+import { __ } from "@/translation";
 import { computed, reactive } from "vue";
 
 export const fieldDependenciesList = createListResource({
@@ -46,4 +47,54 @@ export async function getFieldOptions(field: any): Promise<string[]> {
     optionsMap[field.value] = options.map((o) => o.name);
     return optionsMap[field.value];
   }
+}
+
+// Only the shipped metadata vocabulary is translated. A custom field or value
+// may happen to match a dictionary entry; it must keep its own name.
+const builtinFieldLabels: Record<string, string> = {
+  status: "Status",
+  priority: "Priority",
+  ticket_type: "Ticket Type",
+  agent_group: "Team",
+  ticket_split_from: "Ticket Split From",
+  template: "Template",
+  sla: "SLA",
+  agreement_status: "SLA Status",
+  contact: "Contact",
+  customer: "Customer",
+  email_account: "Email Account",
+  feedback: "Feedback (Option)",
+  merged_with: "Merged With",
+};
+const builtinValues: Record<string, string[]> = {
+  priority: ["Low", "Medium", "High", "Urgent"],
+  ticket_type: ["Question", "Bug", "Incident", "Unspecified"],
+  status: ["Open", "Replied", "Resolved", "Closed"],
+  agreement_status: [
+    "First Response Due",
+    "Resolution Due",
+    "Failed",
+    "Fulfilled",
+    "Paused",
+  ],
+};
+
+export function fieldLabel(field: string, label: string): string {
+  return builtinFieldLabels[field] === label ? __(label) : label;
+}
+
+export function fieldValueLabel(field: string, value: string): string {
+  return builtinValues[field]?.includes(value) ? __(value) : value;
+}
+
+export function matchesFieldValue(
+  field: string,
+  value: string,
+  query: string
+): boolean {
+  const needle = query.toLowerCase();
+  return (
+    value.toLowerCase().includes(needle) ||
+    fieldValueLabel(field, value).toLowerCase().includes(needle)
+  );
 }

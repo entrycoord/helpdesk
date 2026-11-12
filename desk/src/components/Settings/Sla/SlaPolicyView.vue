@@ -295,7 +295,6 @@ import {
   Button,
   Checkbox,
   createResource,
-  DatePicker,
   ErrorMessage,
   FormLabel,
   HoverCard,
@@ -303,6 +302,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
+import { DatePicker } from "@/components/datepicker";
 import {
   computed,
   inject,

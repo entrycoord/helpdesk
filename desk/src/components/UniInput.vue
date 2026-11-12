@@ -28,14 +28,8 @@ import { APIOptions, Field } from "@/types";
 import { __ } from "@/translation";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
-import {
-  Combobox,
-  createResource,
-  DatePicker,
-  DateTimePicker,
-  Select,
-  TextInput,
-} from "frappe-ui";
+import { Combobox, createResource, Select, TextInput } from "frappe-ui";
+import { DatePicker, DateTimePicker } from "@/components/datepicker";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;

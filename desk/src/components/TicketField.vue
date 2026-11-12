@@ -28,15 +28,8 @@ import { APIOptions, Field, FieldValue } from "@/types";
 import { PRIORITY_DISPLAY_ORDER } from "@/stores/ticketPriority";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
-import {
-  Combobox,
-  createResource,
-  DatePicker,
-  DateTimePicker,
-  dayjs,
-  Select,
-  TextInput,
-} from "frappe-ui";
+import { Combobox, createResource, dayjs, Select, TextInput } from "frappe-ui";
+import { DatePicker, DateTimePicker } from "@/components/datepicker";
 import { computed, h, nextTick } from "vue";
 
 interface P {

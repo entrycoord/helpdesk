@@ -11,9 +11,7 @@
         icon-right="lucide-chevron-down"
       >
         <div class="w-full truncate">
-          {{
-            options?.find((option) => option.value == model)?.label || "Select"
-          }}
+          {{ selectedLabel ? __(selectedLabel) : __("Select") }}
         </div>
       </Button>
     </template>
@@ -35,7 +33,7 @@
             "
           >
             <div class="w-full truncate">
-              {{ option.label }}
+              {{ __(option.label) }}
             </div>
             <LucideCheck v-if="model == option.value" class="size-4 ms-2" />
           </div>
@@ -54,9 +52,11 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { splitPlacement } from "@/utils";
 import LucideCheck from "~icons/lucide/check";
 import { Button, Popover } from "frappe-ui";
+import { computed } from "vue";
 
 const model = defineModel();
 
@@ -77,6 +77,10 @@ const onReset = (closePopover: () => void) => {
   model.value = props.defaultValue !== undefined ? props.defaultValue : null;
   closePopover();
 };
+
+const selectedLabel = computed(
+  () => props.options?.find((option) => option.value == model.value)?.label
+);
 
 const onChange = (value: string) => {
   model.value = value;

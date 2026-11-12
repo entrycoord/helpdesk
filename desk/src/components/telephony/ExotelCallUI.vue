@@ -31,13 +31,13 @@
             callStatus == 'Call ended' || callStatus == 'No answer',
         }"
       >
-        <span>{{ callStatus }}</span>
+        <span>{{ __(callStatus) }}</span>
         <span v-if="callStatus == 'Call ended'">
           <span> · </span>
           <span>{{ callDuration }}</span>
         </span>
       </div>
-      <div v-else>{{ callStatus }}</div>
+      <div v-else>{{ __(callStatus) }}</div>
     </div>
     <div v-show="showCallPopup" v-bind="$attrs">
       <div
@@ -69,7 +69,7 @@
           />
           <div class="flex flex-col items-center justify-center gap-1">
             <div class="text-xl-medium">
-              {{ contact?.full_name ?? "Unknown" }}
+              {{ contact?.full_name ?? __("Unknown") }}
             </div>
             <div class="text-sm text-ink-gray-5">
               {{ contact?.mobile_no || contact?.phone }}
@@ -81,7 +81,7 @@
             </div>
           </CountUpTimer>
           <div class="my-1 text-base">
-            {{ callStatus }}
+            {{ __(callStatus) }}
           </div>
         </div>
       </div>
@@ -90,6 +90,7 @@
 </template>
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
+import { __ } from "@/translation";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useDraggable, useWindowSize } from "@vueuse/core";
 import { Avatar, Button, call, toast } from "frappe-ui";
@@ -172,7 +173,7 @@ function makeOutgoingCall(number) {
       onCallStarted && onCallStarted();
     })
     .catch((err) => {
-      const error = err?.messages?.[0] || "Something went wrong";
+      const error = err?.messages?.[0] || __("Something went wrong");
       toast.error(error);
       onCallFailed && onCallFailed();
     });

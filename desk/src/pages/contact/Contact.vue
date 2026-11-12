@@ -343,7 +343,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: `Contact: ${props.id}`,
+    title: __("Contact: {0}", [props.id]),
   };
 });
 </script>

@@ -45,7 +45,8 @@
     </div>
     <div
       v-if="
-        timeAverages.first_response == '0m' && timeAverages.resolution == '0m'
+        timeAverages.first_response == zeroDuration() &&
+        timeAverages.resolution == zeroDuration()
       "
       class="relative flex flex-col mt-5 grow w-full select-none"
     >
@@ -141,9 +142,10 @@
 import LucideCheck from "~icons/lucide/check";
 import { computed, onMounted, ref, type PropType, nextTick } from "vue";
 import { EChartsOption } from "echarts";
-import { createResource, Dropdown, DateRangePicker, Button } from "frappe-ui";
+import { createResource, Dropdown, Button } from "frappe-ui";
+import { DateRangePicker } from "@/components/datepicker";
 import { ECharts } from "frappe-ui/experimental";
-import { dataTheme, formatTime } from "@/utils";
+import { dataTheme, formatDuration, zeroDuration } from "@/utils";
 import { __ } from "@/translation";
 import EmptyState from "@/components/EmptyState.vue";
 
@@ -244,17 +246,17 @@ const timeAverages = computed(() => {
 
   return {
     first_response:
-      formatTime(_averageFirstResponse, {
+      formatDuration(_averageFirstResponse, {
         day: true,
         hour: true,
         minute: true,
-      }) || "0m",
+      }) || zeroDuration(),
     resolution:
-      formatTime(_averageResolution, {
+      formatDuration(_averageResolution, {
         day: true,
         hour: true,
         minute: true,
-      }) || "0m",
+      }) || zeroDuration(),
   };
 });
 
@@ -289,7 +291,7 @@ const chartConfig = computed<EChartsOption>(() => {
         if (p.seriesIndex === 0) {
           return `<span>${category}</span><br/>${__(
             "Avg. first response time"
-          )}: <b>${formatTime(firstResponse, {
+          )}: <b>${formatDuration(firstResponse, {
             day: true,
             hour: true,
             minute: true,
@@ -297,7 +299,7 @@ const chartConfig = computed<EChartsOption>(() => {
         } else {
           return `<span>${category}</span><br/>${__(
             "Avg. resolution time"
-          )}: <b>${formatTime(resolution, {
+          )}: <b>${formatDuration(resolution, {
             day: true,
             hour: true,
             minute: true,

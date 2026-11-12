@@ -144,15 +144,12 @@ import BackButton from "@/components/BackButton.vue";
 import { useDevice } from "@/composables";
 import { __ } from "@/translation";
 import { useDebounceFn, useEventListener } from "@vueuse/core";
+import { Checkbox, Dropdown, Rating, TextInput } from "frappe-ui";
 import {
-  Checkbox,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
-  Dropdown,
-  Rating,
-  TextInput,
-} from "frappe-ui";
+} from "@/components/datepicker";
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import {
   ActiveFilter,

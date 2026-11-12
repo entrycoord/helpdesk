@@ -291,10 +291,10 @@ import {
   Avatar,
   Button,
   createResource,
-  DateRangePicker,
   Dropdown,
   TabButtons,
 } from "frappe-ui";
+import { DateRangePicker } from "@/components/datepicker";
 import { ECharts } from "frappe-ui/experimental";
 import { dataTheme } from "@/utils";
 import LucideStar from "~icons/lucide/star";

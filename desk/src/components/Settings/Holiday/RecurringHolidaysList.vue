@@ -29,6 +29,7 @@
           <div v-if="column.key === 'repetition'">
             {{ getRepetitionText(holiday[column.key]) }}
           </div>
+          <div v-else-if="column.key === 'day'">{{ __(holiday.day) }}</div>
           <div v-else>{{ holiday[column.key] }}</div>
         </div>
         <div class="flex justify-end">

@@ -35,26 +35,83 @@ function translate(
 
 export const __ = translate;
 
-/** Relative times ("an hour ago") come from dayjs, so its English strings
- *  are replaced with translatable ones. */
+// Load only the requested locale. The boot language is resolved by Frappe for
+// this user; browser language and site defaults may be different.
+const localeLoaders = import.meta.glob<{ default: any }>(
+  "../node_modules/dayjs/esm/locale/*.js"
+);
+let activeLocale = "en";
+
+async function applyDateLocale() {
+  const language =
+    typeof (window as any).lang === "string"
+      ? (window as any).lang.trim().toLowerCase().replace(/_/g, "-")
+      : "";
+  const candidates = [language, language.split("-")[0]].filter(Boolean);
+  activeLocale = "en";
+  for (const candidate of candidates) {
+    if (candidate === "en") break;
+    const loader =
+      localeLoaders[`../node_modules/dayjs/esm/locale/${candidate}.js`];
+    if (!loader) continue;
+    try {
+      const { default: locale } = await loader();
+      // Register on frappe-ui's dayjs instance, even if the package is duplicated.
+      dayjs.locale({ ...locale }, undefined, true);
+      activeLocale = locale.name;
+      break;
+    } catch (error) {
+      console.warn("Date locale could not be loaded", candidate, error);
+    }
+  }
+  dayjs.locale(activeLocale);
+}
+
+/** Hungarian catalog phrases use an "ezelőtt"/"múlva" wrapper.
+ * Other locales need their native plural and direction rules. */
 function applyRelativeTimeLocale() {
-  dayjs.updateLocale("en", {
-    relativeTime: {
-      future: __("in %s"),
-      past: __("%s ago"),
-      s: __("a few seconds"),
-      m: __("a minute"),
-      mm: __("%d minutes"),
-      h: __("an hour"),
-      hh: __("%d hours"),
-      d: __("a day"),
-      dd: __("%d days"),
-      M: __("a month"),
-      MM: __("%d months"),
-      y: __("a year"),
-      yy: __("%d years"),
-    },
-  });
+  if (activeLocale !== "hu") return;
+  const relativeTime = {
+    future: __("in %s"),
+    past: __("%s ago"),
+    s: __("a few seconds"),
+    m: __("a minute"),
+    mm: __("%d minutes"),
+    h: __("an hour"),
+    hh: __("%d hours"),
+    d: __("a day"),
+    dd: __("%d days"),
+    M: __("a month"),
+    MM: __("%d months"),
+    y: __("a year"),
+    yy: __("%d years"),
+  };
+  // Avoid mixed languages or lost substitutions with an incomplete catalog.
+  const required = [
+    ["in %s", "%s"],
+    ["%s ago", "%s"],
+    ["a few seconds", ""],
+    ["a minute", ""],
+    ["%d minutes", "%d"],
+    ["an hour", ""],
+    ["%d hours", "%d"],
+    ["a day", ""],
+    ["%d days", "%d"],
+    ["a month", ""],
+    ["%d months", "%d"],
+    ["a year", ""],
+    ["%d years", "%d"],
+  ];
+  if (
+    required.every(([key, placeholder]) => {
+      const value = messages.value[key];
+      return (
+        value && value !== key && (!placeholder || value.includes(placeholder))
+      );
+    })
+  ) {
+    dayjs.updateLocale("hu", { relativeTime });
+  }
 }
 
 function setMessages(data: Record<string, string>) {
@@ -66,7 +123,11 @@ function setMessages(data: Record<string, string>) {
 /** Fetches the dictionary. Awaited before the app mounts, so the very first
  *  render is already translated; a slow or failed request never blocks it. */
 export async function loadTranslations(timeoutMs = 4000): Promise<void> {
-  if (Object.keys(messages.value).length) return;
+  await applyDateLocale();
+  if (Object.keys(messages.value).length) {
+    applyRelativeTimeLocale();
+    return;
+  }
   try {
     // the endpoint only answers GET, which `call()` does not send
     const resource = createResource({
@@ -89,7 +150,6 @@ export function translationPlugin(app: App<Element>) {
   app.config.globalProperties.__ = translate;
   const windowObj = window as any;
   windowObj.__ = translate;
-  if (Object.keys(messages.value).length) applyRelativeTimeLocale();
 }
 
 declare module "@vue/runtime-core" {

@@ -28,7 +28,11 @@
 
         <!-- reuse the framework row, bolding tag names alongside the actor -->
         <template #item-log="{ activity }">
-          <LogItem :activity="withTagNamesBold(activity)" />
+          <TimelineLogRow :activity="withTagNamesBold(activity)" />
+        </template>
+
+        <template #item-version="{ activity }">
+          <TimelineVersionRow :activity="activity" />
         </template>
 
         <template #item-comment="{ activity }">
@@ -147,7 +151,6 @@ import { copyActivityLink } from "@/utils";
 import {
   ActivityTimeline,
   EmailItem,
-  LogItem,
   TimelineContainer,
   useActivityTimeline,
   type Activity,
@@ -170,7 +173,10 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideSplit from "~icons/lucide/split";
 import { glideToRow } from "./glideToRow";
+import { translateTagActivity } from "./historyDisplay";
 import PinnedCommentsBar from "./PinnedCommentsBar.vue";
+import TimelineLogRow from "./TimelineLogRow.vue";
+import TimelineVersionRow from "./TimelineVersionRow.vue";
 import TimelineCommentRow, { CommentExtras } from "./TimelineCommentRow.vue";
 
 const props = defineProps<{
@@ -326,6 +332,16 @@ function withTagNamesBold(activity: LogActivity): LogActivity {
     ...activity,
     data: {
       ...activity.data,
+      text: translateTagActivity(text, activity.author?.fullname, {
+        both: (author, added, removed) =>
+          __("{0} added tags {1} and removed tags {2}", [
+            author,
+            added,
+            removed,
+          ]),
+        added: (author, names) => __("{0} added tags {1}", [author, names]),
+        removed: (author, names) => __("{0} removed tags {1}", [author, names]),
+      }),
       assignees: [...(activity.data.assignees ?? []), ...names],
     },
   };

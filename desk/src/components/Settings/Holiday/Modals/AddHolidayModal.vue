@@ -69,9 +69,9 @@ import {
   FormLabel,
   toast,
   ErrorMessage,
-  DatePicker,
   dayjs,
 } from "frappe-ui";
+import { DatePicker } from "@/components/datepicker";
 import { ref } from "vue";
 import { holidayData } from "@/stores/holidayList";
 import { __ } from "@/translation";
@@ -138,7 +138,7 @@ const onSave = () => {
       getFormattedDate(holidayExists.holiday_date) !==
         getFormattedDate(dialog.value.editing.holiday_date)
     ) {
-      toast.error("Holiday already exists");
+      toast.error(__("Holiday already exists"));
       return;
     }
     const holidayIndex = holidayData.value.holidays.indexOf(
@@ -155,7 +155,7 @@ const onSave = () => {
         getFormattedDate(dialog.value.holiday_date)
     );
     if (index !== -1) {
-      toast.error("Holiday already exists");
+      toast.error(__("Holiday already exists"));
       return;
     }
     holidayData.value.holidays.push({

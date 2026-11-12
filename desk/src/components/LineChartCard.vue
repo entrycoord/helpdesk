@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { buildPercentageChange, formatTime } from "@/utils";
+import { buildPercentageChange, formatDuration, zeroDuration } from "@/utils";
 import { EChartsOption } from "echarts";
 import { createResource } from "frappe-ui";
 import { computed, onMounted, ref, type PropType } from "vue";
@@ -90,12 +90,12 @@ const chartData = computed(() => {
   // for time take average and for count take total
   const text =
     props.type === "Time"
-      ? formatTime(_data?.average || 0, {
+      ? formatDuration(_data?.average || 0, {
           day: true,
           hour: true,
           minute: true,
           maxUnits: 2,
-        }) || "0m"
+        }) || zeroDuration()
       : _data?.total || 0;
 
   return {
@@ -169,12 +169,12 @@ const chartConfig = computed<EChartsOption>(() => {
         if (p.value === undefined || p.value === null) return "";
         const value =
           props.type === "Time"
-            ? formatTime(Number(p.value) || 0, {
+            ? formatDuration(Number(p.value) || 0, {
                 day: true,
                 hour: true,
                 minute: true,
                 maxUnits: 2,
-              }) || "0m"
+              }) || zeroDuration()
             : p.value;
         return `<span style="font-size:12px;color:#6b7280">${p.name}: <b style="color:#374151">${value}</b></span>`;
       },

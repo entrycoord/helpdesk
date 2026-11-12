@@ -101,7 +101,20 @@
           :key="index"
           :text="tooltip"
         >
-          <NumberCard v-bind="card" />
+          <NumberCard v-bind="card">
+            <template #empty>
+              <div class="text-3xl-semibold tabular-nums text-ink-gray-4">
+                —
+              </div>
+              <div class="text-sm text-ink-gray-5">{{ __("No data") }}</div>
+            </template>
+            <template #error="{ error }">
+              <div class="text-sm-medium text-ink-red-7">
+                {{ __("Could not render this chart") }}
+              </div>
+              <div class="truncate text-p-sm text-ink-gray-5">{{ error }}</div>
+            </template>
+          </NumberCard>
         </Tooltip>
       </div>
       <div
@@ -210,12 +223,13 @@
 
 <script setup lang="ts">
 import { useScreenSize } from "@/composables/screen";
+import { fieldValueLabel } from "@/components/Settings/FieldDependency/fieldDependency";
 import { useAuthStore } from "@/stores/auth";
+import { DateRangePicker } from "@/components/datepicker";
 import { __ } from "@/translation";
 import { Link } from "@framework/ui";
 import { useStorage } from "@vueuse/core";
 import {
-  DateRangePicker,
   Dropdown,
   TabButtons,
   Tooltip,
@@ -493,9 +507,80 @@ const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
 
-// api already sends the frappe-ui props for each chart
+// Only translate fixed API vocabulary at the presentation boundary. Series keys,
+// tag names and other user-defined category values remain unchanged.
 function getChartType({ type, key, ...props }: any) {
-  return h(type === "donut" ? DonutChart : BarChart, props);
+  const labels: Record<string, string> = {
+    Date: __("Date"),
+    Team: __("Team"),
+    Type: __("Type"),
+    Priority: __("Priority"),
+    Tickets: __("Tickets"),
+    "% SLA": __("% SLA"),
+  };
+  for (const axis of ["xAxis", "yAxis", "y2Axis"]) {
+    if (props[axis]?.title && labels[props[axis].title]) {
+      props[axis] = { ...props[axis], title: labels[props[axis].title] };
+    }
+  }
+  const seriesLabels: Record<string, Record<string, string>> = {
+    ticket_trend: {
+      Open: __("Open"),
+      Closed: __("Closed"),
+      "SLA Fulfilled": __("SLA Fulfilled"),
+    },
+    feedback_trend: {
+      "Rated Tickets": __("Rated Tickets"),
+      Rating: __("Rating"),
+    },
+    tickets_by_team: { count: __("Tickets") },
+    tickets_by_type: { count: __("Tickets") },
+    tickets_by_priority: { count: __("Tickets") },
+  };
+  if (seriesLabels[key]) {
+    props.seriesConfig = { ...props.seriesConfig };
+    for (const [name, label] of Object.entries(seriesLabels[key])) {
+      props.seriesConfig[name] = { ...props.seriesConfig[name], label };
+    }
+  }
+  // Bar chart formatters change only text; category keys and rows stay raw.
+  const categoryField =
+    key === "tickets_by_priority"
+      ? "priority"
+      : key === "tickets_by_type"
+      ? "ticket_type"
+      : null;
+  if (type === "bar" && categoryField) {
+    props.xAxis = {
+      ...props.xAxis,
+      format: (value: unknown) =>
+        typeof value === "string"
+          ? fieldValueLabel(categoryField, value)
+          : String(value),
+    };
+  }
+  if (type === "donut") {
+    props.centerLabel = __("Count");
+    // Channel is a fixed API enum, unlike team, type, priority and tag names.
+    if (key === "tickets_by_channel") {
+      const channels: Record<string, string> = {
+        Portal: __("Portal"),
+        Email: __("Email"),
+      };
+      props.data = props.data.map((row: any) => ({
+        ...row,
+        channel: channels[row.channel] ?? row.channel,
+      }));
+    }
+  }
+  return h(type === "donut" ? DonutChart : BarChart, props, {
+    empty: () => __("No data to show"),
+    error: ({ error }: { error: string }) =>
+      h("div", { class: "text-sm text-ink-red-7" }, [
+        h("div", __("Could not render this chart")),
+        h("div", { class: "text-ink-gray-5" }, error),
+      ]),
+  });
 }
 
 // include today, so last 7 days is today and the 6 days before. The site's

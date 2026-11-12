@@ -28,6 +28,7 @@
 import {
   dateFormat,
   dateTooltipFormat,
+  formatDuration,
   formatTime,
   getTimeInSeconds,
 } from "@/utils";
@@ -63,7 +64,7 @@ const firstResponseBadge = computed(() => {
     }
     handleFirstResponseInterval(responseBy);
     firstResponse = {
-      label: __("Due in {0}", [formatTime(firstResponseSeconds.value)]),
+      label: __("Due in {0}", [formatDuration(firstResponseSeconds.value)]),
       color: "orange",
     };
   } else if (
@@ -73,7 +74,7 @@ const firstResponseBadge = computed(() => {
   ) {
     firstResponse = {
       label: __("Fulfilled in {0}", [
-        formatTime(
+        formatDuration(
           dayjs(props.ticket.first_responded_on).diff(
             dayjs(props.ticket.creation),
             "s"
@@ -103,7 +104,7 @@ const resolutionBadge = computed(() => {
   ) {
     let timeLeft = dayjs(props.ticket.resolution_by).diff(dayjs(), "s");
     resolution = {
-      label: __("{0} left (On Hold)", [formatTime(timeLeft)]),
+      label: __("{0} left (On Hold)", [formatDuration(timeLeft)]),
       color: "blue",
     };
   } else if (
@@ -116,13 +117,13 @@ const resolutionBadge = computed(() => {
     handleResolutionInterval(resolutionBy);
 
     resolution = {
-      label: __("Due in {0}", [formatTime(resolutionSeconds.value)]),
+      label: __("Due in {0}", [formatDuration(resolutionSeconds.value)]),
       color: "orange",
     };
   } else if (props.ticket.agreement_status === "Fulfilled") {
     resolution = {
       label: __("Fulfilled in {0}", [
-        formatTime(dayjs(props.ticket.resolution_time, "s")),
+        formatDuration(dayjs(props.ticket.resolution_time, "s")),
       ]),
       color: "green",
     };
@@ -142,7 +143,7 @@ function getCalculatedResolution() {
   );
   // let now = new Date()
   resolution = dayjs(resolution).diff(dayjs(), "s");
-  return formatTime(resolution);
+  return formatDuration(resolution);
 }
 
 const sections = computed(() => [

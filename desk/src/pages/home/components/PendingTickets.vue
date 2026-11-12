@@ -177,6 +177,7 @@ import TimerIcon from "~icons/lucide/timer";
 interface TicketReason {
   type: string;
   text: string;
+  overdue?: boolean;
   seconds_until_due?: number;
 }
 
@@ -292,9 +293,10 @@ const showSkeleton = computed(
 
 function getReasonColorClass(reason: {
   text: string;
+  overdue?: boolean;
   seconds_until_due?: number;
 }) {
-  if (reason.text.includes("overdue")) {
+  if (reason.overdue) {
     return "text-ink-red-6";
   }
 

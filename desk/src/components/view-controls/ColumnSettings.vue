@@ -57,6 +57,8 @@
             <Combobox
               :model-value="null"
               :options="fields"
+              :placeholder="__('Search')"
+              :empty-text="__('No results')"
               align="end"
               @update:selected-option="(option) => option && addColumn(option)"
             >
@@ -211,21 +213,27 @@ const rows = computed({
 const fields = computed(() => {
   let allFields = list.data?.fields;
   if (!allFields) return [];
-  if (columns.value === "") return allFields;
-  return allFields.filter((field) => {
-    return !columns.value.find((column) => column.key === field.value);
-  });
+  return allFields
+    .filter((field) => {
+      return (
+        columns.value === "" ||
+        !columns.value.find((column) => column.key === field.value)
+      );
+    })
+    .map((field) => ({ ...field, label: __(field.label) }));
 });
 
 function addColumn(c) {
   // Combobox normalisation overwrites the option's `type` with "option", so
   // read the real fieldtype back from the source list.
-  const type = list.data?.fields?.find((f) => f.value === c.value)?.type;
+  const sourceField = list.data?.fields?.find((f) => f.value === c.value);
+  if (!sourceField) return;
+  const type = sourceField.type;
   let align = ["Float", "Int", "Percent", "Currency"].includes(type)
     ? "right"
     : "left";
   let _column = {
-    label: c.label,
+    label: sourceField.label,
     type,
     key: c.value,
     width: "10rem",

@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 import frappe
 from dateutil.relativedelta import relativedelta
+from frappe import _
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
 from frappe.utils import add_months, today
@@ -450,17 +451,17 @@ def _get_upcoming_sla_tickets(limit=10):
             due_time = ticket.get("resolution_by")
             time_until = format_time_difference(due_time, context="until")
             reason_text = (
-                f"Resolution due in {time_until}"
+                _("Resolution due in {0}").format(time_until)
                 if time_until != "overdue"
-                else "Resolution overdue"
+                else _("Resolution overdue")
             )
         else:
             due_time = ticket.get("response_by")
             time_until = format_time_difference(due_time, context="until")
             reason_text = (
-                f"Response due in {time_until}"
+                _("Response due in {0}").format(time_until)
                 if time_until != "overdue"
-                else "Response overdue"
+                else _("Response overdue")
             )
 
         # Calculate seconds until due for frontend urgency coloring
@@ -474,6 +475,8 @@ def _get_upcoming_sla_tickets(limit=10):
         ticket["reason"] = {
             "type": "upcoming_sla",
             "text": reason_text,
+            # the text is translated, so the client must not infer this from it
+            "overdue": time_until == "overdue",
             "seconds_until_due": seconds_until_due,
         }
 
@@ -526,7 +529,7 @@ def _get_new_tickets(limit=10):
     for ticket in tickets:
         ticket["reason"] = {
             "type": "new_tickets",
-            "text": "Recently assigned",
+            "text": _("Recently assigned"),
         }
 
     total_count = get_ticket_count(filters=filters)
@@ -564,7 +567,7 @@ def _get_pending_response_tickets(limit=10):
         time_ago = format_time_difference(t.get("last_customer_response"))
         t["reason"] = {
             "type": "pending",
-            "text": f"Pending for {time_ago}",
+            "text": _("Pending for {0}").format(time_ago),
         }
 
     return tickets, total_count
@@ -714,10 +717,21 @@ def _updated_label(data: str | None) -> str | None:
     except (ValueError, TypeError):
         return None
     changed = {field: new for field, _old, new in changes}
-    for field, label in FEED_FIELD_LABELS.items():
+    for field in FEED_FIELD_LABELS:
         if field not in changed:
             continue
         new = changed[field]
-        text = f"set {label} to {new}" if new else f"cleared {label}"
-        return text[:1].upper() + text[1:]
+        if field == "agent_group":
+            # team names are user data: keep them as they are
+            return _("Set team to {0}").format(new) if new else _("Cleared team")
+        # status, priority and type values are shipped vocabulary with translations
+        value = _(new) if new else new
+        if field == "status":
+            return _("Set status to {0}").format(value) if new else _("Cleared status")
+        if field == "priority":
+            return (
+                _("Set priority to {0}").format(value) if new else _("Cleared priority")
+            )
+        if field == "ticket_type":
+            return _("Set type to {0}").format(value) if new else _("Cleared type")
     return None

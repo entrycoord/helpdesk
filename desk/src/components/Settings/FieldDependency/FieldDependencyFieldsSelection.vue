@@ -7,7 +7,7 @@
       </span>
       <Combobox
         v-model="state.selectedParentField"
-        :options="parentFields"
+        :options="displayParentFields"
         :disabled="!isNew"
         :open-on-focus="true"
         class="w-full"
@@ -20,7 +20,7 @@
       </span>
       <Combobox
         v-model="state.selectedChildField"
-        :options="state.childFields"
+        :options="displayChildFields"
         :disabled="!state.selectedParentField || !isNew"
         :open-on-focus="true"
         class="w-full"
@@ -32,6 +32,8 @@
 <script setup lang="ts">
 import { FieldCriteriaState } from "@/types";
 import { Combobox } from "frappe-ui";
+import { computed } from "vue";
+import { fieldLabel } from "./fieldDependency";
 
 const state = defineModel<FieldCriteriaState>();
 
@@ -39,6 +41,15 @@ const props = defineProps<{
   isNew: boolean;
   parentFields: any[];
 }>();
+const displayFields = (fields: any[]) =>
+  fields.map((field) => ({
+    ...field,
+    label: fieldLabel(field.value, field.label),
+  }));
+const displayParentFields = computed(() => displayFields(props.parentFields));
+const displayChildFields = computed(() =>
+  displayFields(state.value.childFields)
+);
 </script>
 
 <style scoped></style>

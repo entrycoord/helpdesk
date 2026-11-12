@@ -70,6 +70,7 @@ import { getMeta } from "@/stores/meta";
 import { __ } from "@/translation";
 import { MultiSelect, Switch } from "frappe-ui";
 import { computed } from "vue";
+import { fieldLabel, fieldValueLabel } from "./fieldDependency";
 
 const props = defineProps<{
   parentFieldValues: string[];
@@ -86,8 +87,8 @@ const { getField } = getMeta("HD Ticket");
 const selections = computed(() => {
   let childField = state.value.selectedChildField;
   let parentField = state.value.selectedParentField;
-  childField = getField(childField)?.label;
-  parentField = getField(parentField)?.label;
+  childField = fieldLabel(childField, getField(childField)?.label || "");
+  parentField = fieldLabel(parentField, getField(parentField)?.label || "");
   return { childField, parentField };
 });
 
@@ -95,7 +96,10 @@ const fieldCriteriaOptions = computed(() => {
   const _options = [{ label: __("Any"), value: "Any" }];
   props.parentFieldValues.forEach((value) => {
     if (!_options.some((o) => o.value === value)) {
-      _options.push({ label: value, value });
+      _options.push({
+        label: fieldValueLabel(state.value.selectedParentField, value),
+        value,
+      });
     }
   });
   return _options;

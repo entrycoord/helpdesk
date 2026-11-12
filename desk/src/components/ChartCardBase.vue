@@ -34,7 +34,7 @@
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
               <div class="flex gap-1">
-                <span>vs</span>
+                <span>{{ __("vs") }}</span>
                 <span>{{ __(currentDuration).toLowerCase() }}</span>
               </div>
               <LucideChevronDown class="size-4" />

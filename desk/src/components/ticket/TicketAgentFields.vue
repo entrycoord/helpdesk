@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { Field, FieldValue } from "@/types";
+import { __ } from "@/translation";
 import { toast } from "frappe-ui";
 import { computed } from "vue";
 import TicketField from "../TicketField.vue";
@@ -32,7 +33,7 @@ const fields = computed(() => {
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {
   if (field === "subject" && value === "") {
-    toast.error("Subject is required");
+    toast.error(__("Subject is required"));
     event.target.value = props.ticket.subject;
     return;
   }

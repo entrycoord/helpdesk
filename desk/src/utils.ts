@@ -243,6 +243,22 @@ export function formatTime(
   return limited.join(" ").trim();
 }
 
+// Display-only variant of formatTime. formatTime itself must keep its raw
+// "1d 2h 3m" output because getTimeInSeconds parses it back.
+export function formatDuration(
+  seconds: number,
+  config?: Parameters<typeof formatTime>[1]
+) {
+  return formatTime(seconds, config).replace(
+    /(\d+)([dhms])\b/g,
+    (_match, n: string, unit: string) => __("{0}" + unit, [n])
+  );
+}
+
+export function zeroDuration() {
+  return __("{0}m", [0]);
+}
+
 export function getTimeInSeconds(time: string) {
   // time in the format 1h 2m 3s
   let timeParts = time.split(" ");

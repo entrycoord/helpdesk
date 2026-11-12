@@ -131,6 +131,36 @@
           @update:model-value="(count) => handlePageLength(count)"
         />
       </template>
+      <!-- The stock footer hardcodes "Load More" and "of"; same markup, translated. -->
+      <template #right>
+        <div class="flex items-center">
+          <Button
+            v-if="
+              list?.data?.row_count &&
+              list?.data?.total_count &&
+              list.data.row_count < list.data.total_count
+            "
+            :label="__('Load More')"
+            @click="handlePageLength(defaultParams.page_length_count, true)"
+          />
+          <div
+            v-if="
+              list?.data?.row_count &&
+              list?.data?.total_count &&
+              list.data.row_count < list.data.total_count
+            "
+            class="mx-3 h-[80%] border-l"
+          />
+          <div class="flex items-center gap-1 text-base text-ink-gray-5">
+            {{
+              __("{0} of {1}", [
+                list?.data?.row_count || 0,
+                list?.data?.total_count || 0,
+              ])
+            }}
+          </div>
+        </div>
+      </template>
     </ListFooter>
   </div>
   <!-- Empty State -->
