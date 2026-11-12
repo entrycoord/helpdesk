@@ -154,11 +154,19 @@ export function normalizeFilters(raw: any): FilterCondition[] {
   });
 }
 
+const translatedLinkDoctypes = [
+  "HD Ticket Status",
+  "HD Ticket Priority",
+  "HD Ticket Type",
+];
+
 export function useLinkSearch(doctype: string, filters?: Record<string, any>) {
+  // Small configuration vocabularies can be searched by their translated labels.
+  const localSearch = translatedLinkDoctypes.includes(doctype);
   const results = createResource({
     url: "frappe.desk.search.search_link",
     method: "POST",
-    params: { txt: "", doctype, filters, page_length: 10 },
+    params: { txt: "", doctype, filters, page_length: localSearch ? 1000 : 10 },
     transform: (data: any[]) => {
       const options = data.map((option) => ({
         value: option.value,
@@ -173,12 +181,12 @@ export function useLinkSearch(doctype: string, filters?: Record<string, any>) {
   if (doctype) results.reload();
 
   const search = useDebounceFn((txt: string) => {
-    if (!doctype) return;
+    if (!doctype || localSearch) return;
     results.update({ params: { txt, doctype, filters, page_length: 10 } });
     results.reload();
   }, 300);
 
-  return { results, search };
+  return { results, search, localSearch };
 }
 
 function buildCondition(
@@ -300,6 +308,19 @@ export function fieldIcon(field: FilterField): Component {
   return iconMap[field.fieldtype] || LucideType;
 }
 
+// Only known ticket vocabularies and boolean values are translated; names of
+// customers, users, tags and other free data must remain untouched.
+export function filterValueLabel(field: FilterField, value: string): string {
+  if (
+    field.fieldtype === "Check" ||
+    (field.fieldtype === "Select" && field.fieldname === "status") ||
+    (field.fieldtype === "Link" &&
+      translatedLinkDoctypes.includes(field.options || ""))
+  )
+    return __(value);
+  return value;
+}
+
 export function filterSummary(filter: ActiveFilter): string {
   const operatorLabels: Record<string, string> = {
     equals: __("is"),
@@ -334,8 +355,16 @@ function displayValue(filter: ActiveFilter): string {
       ? shortList(value.map(toStars))
       : toStars(value);
   }
-  if (Array.isArray(value)) return shortList(value);
-  if (typeof value === "string") return value.replaceAll("%", "");
+  if (filter.operator === "is") {
+    if (value === "set") return __("Set");
+    if (value === "not set") return __("Not Set");
+  }
+  if (Array.isArray(value))
+    return shortList(
+      value.map((item) => filterValueLabel(filter.field, String(item)))
+    );
+  if (typeof value === "string")
+    return filterValueLabel(filter.field, value.replaceAll("%", ""));
   return String(value ?? "");
 }
 

@@ -157,6 +157,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import {
   ActiveFilter,
   FilterField,
+  filterValueLabel,
   multiValueFields,
   useFilter,
   useLinkSearch,
@@ -259,14 +260,27 @@ const options = computed<Array<{ label: string; value: string }>>(() => {
   }
   if (isDate.value)
     return timespanOptions.filter((option) => matches(option.label));
-  if (isLink.value) return withSelectedOptions(linkSearch.results.data || []);
+  if (isLink.value)
+    return withSelectedOptions(linkSearch.results.data || [])
+      .map((option) => ({
+        ...option,
+        label: filterValueLabel(props.field, option.label),
+      }))
+      .filter((option) =>
+        linkSearch.localSearch
+          ? matches(option.label) || matches(option.value)
+          : true
+      );
   const values =
     props.field.fieldtype === "Check"
       ? ["Yes", "No"]
       : getSelectOptions(props.field.options);
   return values
-    .filter(matches)
-    .map((option) => ({ label: option, value: option }));
+    .map((option) => ({
+      label: filterValueLabel(props.field, option),
+      value: option,
+    }))
+    .filter((option) => matches(option.label) || matches(option.value));
 });
 
 // Selected values outside the search results (pasted, or past the first page)
@@ -277,8 +291,12 @@ function withSelectedOptions(results: Array<{ label: string; value: string }>) {
   const query = search.value.toLowerCase();
   const pinned = value.value
     .filter((selected: string) => !resultValues.has(selected))
-    .filter((selected: string) =>
-      String(selected).toLowerCase().includes(query)
+    .filter(
+      (selected: string) =>
+        String(selected).toLowerCase().includes(query) ||
+        filterValueLabel(props.field, String(selected))
+          .toLowerCase()
+          .includes(query)
     )
     .map((selected: string) => ({ label: selected, value: selected }));
   return [...pinned, ...results];
