@@ -117,6 +117,55 @@
           />
         </div>
 
+        <div class="flex flex-col gap-3">
+          <div class="text-base-semibold text-ink-gray-9">
+            {{ __("Report attachments") }}
+          </div>
+          <p class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Leave blank to use the defaults. Size and file types cannot exceed system settings; proxy limits may be lower. Video size applies to mp4, webm, mov, m4v, ogv and avi."
+              )
+            }}
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <FormControl
+              v-model="form.maxFiles"
+              type="number"
+              min="0"
+              :label="__('Maximum files')"
+              :placeholder="__('Default: 5')"
+            />
+            <FormControl
+              v-model="form.maxSizeMb"
+              type="number"
+              min="0"
+              :label="__('Maximum file size (MB)')"
+              :placeholder="__('System limit')"
+            />
+            <FormControl
+              v-model="form.videoMaxSizeMb"
+              type="number"
+              min="0"
+              :label="__('Maximum video size (MB)')"
+              :placeholder="__('Same as other files')"
+            />
+            <FormControl
+              v-model="form.allowedExtensions"
+              type="text"
+              :label="__('Allowed extensions')"
+              :placeholder="__('System file types')"
+            />
+          </div>
+          <p class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Separate extensions with spaces, for example: pdf png mp4. Zero means default."
+              )
+            }}
+          </p>
+        </div>
+
         <div class="flex flex-col gap-1.5">
           <Checkbox
             v-model="form.grantCustomerRole"
@@ -164,6 +213,10 @@ interface IssueReportForm {
   ticketType: string;
   priority: string;
   grantCustomerRole: boolean;
+  maxFiles: string | number;
+  maxSizeMb: string | number;
+  videoMaxSizeMb: string | number;
+  allowedExtensions: string;
 }
 
 const emptyForm = (): IssueReportForm => ({
@@ -176,6 +229,10 @@ const emptyForm = (): IssueReportForm => ({
   ticketType: "",
   priority: "",
   grantCustomerRole: true,
+  maxFiles: "",
+  maxSizeMb: "",
+  videoMaxSizeMb: "",
+  allowedExtensions: "",
 });
 
 const form = ref<IssueReportForm>(emptyForm());
@@ -191,6 +248,10 @@ const toForm = (data: Record<string, any>): IssueReportForm => ({
   team: data.issue_report_team || "",
   ticketType: data.issue_report_ticket_type || "",
   priority: data.issue_report_priority || "",
+  maxFiles: data.issue_report_max_files || "",
+  maxSizeMb: data.issue_report_max_size_mb || "",
+  videoMaxSizeMb: data.issue_report_video_max_size_mb || "",
+  allowedExtensions: data.issue_report_allowed_extensions || "",
   grantCustomerRole:
     data.issue_report_grant_customer_role != null
       ? Boolean(data.issue_report_grant_customer_role)
@@ -223,6 +284,10 @@ const saveResource = createResource({
       issue_report_team: form.value.team,
       issue_report_ticket_type: form.value.ticketType,
       issue_report_priority: form.value.priority,
+      issue_report_max_files: form.value.maxFiles || 0,
+      issue_report_max_size_mb: form.value.maxSizeMb || 0,
+      issue_report_video_max_size_mb: form.value.videoMaxSizeMb || 0,
+      issue_report_allowed_extensions: form.value.allowedExtensions.trim(),
       issue_report_grant_customer_role: form.value.grantCustomerRole ? 1 : 0,
     },
   }),

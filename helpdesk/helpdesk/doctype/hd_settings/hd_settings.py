@@ -19,10 +19,21 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 
 class HDSettings(Document):
     def validate(self):
+        self.validate_report_attachments()
         self.validate_auto_close_days()
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
         self.validate_default_agent_status()
+
+    def validate_report_attachments(self):
+        import re
+
+        for field in ("issue_report_max_files", "issue_report_max_size_mb", "issue_report_video_max_size_mb"):
+            if (self.get(field) or 0) < 0:
+                frappe.throw(_("Report attachment limits cannot be negative."))
+        extensions = self.get("issue_report_allowed_extensions") or ""
+        if any(not re.fullmatch(r"\.?[a-zA-Z0-9]+", part) for part in extensions.split()):
+            frappe.throw(_("Use space-separated file extensions, such as pdf png mp4."))
 
     def validate_default_agent_status(self):
         """The default status should be enabled, else agent creation breaks.

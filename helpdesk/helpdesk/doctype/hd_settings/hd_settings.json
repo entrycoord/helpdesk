@@ -76,6 +76,10 @@
   "issue_report_ticket_type",
   "issue_report_priority",
   "issue_report_grant_customer_role",
+  "issue_report_max_files",
+  "issue_report_max_size_mb",
+  "issue_report_video_max_size_mb",
+  "issue_report_allowed_extensions",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -628,6 +632,26 @@
    "label": "Let reporters open their own tickets",
    "default": "1",
    "description": "Gives every user with Desk access the HD Customer role, so a reporter can follow the ticket in the helpdesk portal. New users get it automatically; turning this off does not remove roles already granted."
+  },
+  {
+   "fieldname": "issue_report_max_files",
+   "fieldtype": "Int",
+   "label": "Report maximum files"
+  },
+  {
+   "fieldname": "issue_report_max_size_mb",
+   "fieldtype": "Int",
+   "label": "Report maximum file size (MB)"
+  },
+  {
+   "fieldname": "issue_report_video_max_size_mb",
+   "fieldtype": "Int",
+   "label": "Report maximum video size (MB)"
+  },
+  {
+   "fieldname": "issue_report_allowed_extensions",
+   "fieldtype": "Small Text",
+   "label": "Report allowed extensions"
   }
  ],
  "grid_page_length": 50,
