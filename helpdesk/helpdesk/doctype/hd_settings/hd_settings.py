@@ -9,6 +9,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
+from frappe.utils import flt
 from frappe.utils.jinja import validate_template
 
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
@@ -29,7 +30,7 @@ class HDSettings(Document):
         import re
 
         for field in ("issue_report_max_files", "issue_report_max_size_mb", "issue_report_video_max_size_mb"):
-            if (self.get(field) or 0) < 0:
+            if flt(self.get(field)) < 0:
                 frappe.throw(_("Report attachment limits cannot be negative."))
         extensions = self.get("issue_report_allowed_extensions") or ""
         if any(not re.fullmatch(r"\.?[a-zA-Z0-9]+", part) for part in extensions.split()):
