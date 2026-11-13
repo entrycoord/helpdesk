@@ -14,8 +14,14 @@ export interface App {
 const deskApp: App = {
   name: "frappe",
   logo: "/assets/helpdesk/desk/desk.png",
-  title: "Desk",
+  title: "System",
   route: "/desk/helpdesk",
+};
+
+// Product names we show instead of the upstream app titles.
+const APP_TITLES: Record<string, string> = {
+  erpnext: "ERP",
+  crm: "CRM",
 };
 
 interface AppsMenuOption {
@@ -45,7 +51,7 @@ export function useApps() {
         apps.push({
           name: app.name,
           logo: app.logo,
-          title: app.title,
+          title: APP_TITLES[app.name] || app.title,
           route: app.route,
         });
       });

@@ -327,10 +327,12 @@ import {
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { storeToRefs } from "pinia";
+import { useConfigStore } from "@/stores/config";
 import { useRouter } from "vue-router";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const configStore = useConfigStore();
 const authStore = useAuthStore();
 
 const ticketStatusStore = useTicketStatusStore();
@@ -588,7 +590,7 @@ onMounted(() => {
 watch(ticket, (ticket) => ticket.markSeen.reload(), { immediate: true });
 
 onUnmounted(() => {
-  document.title = "Helpdesk";
+  document.title = configStore.productName;
 });
 </script>
 <style scoped>

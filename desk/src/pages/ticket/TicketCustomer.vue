@@ -391,7 +391,8 @@ const breadcrumbs = computed(() => {
 const showEditor = computed(() => ticket.data.status !== "Closed");
 
 // this handles whether the ticket was raised and then was closed without any reply from the agent.
-const { isFeedbackMandatory } = useConfigStore();
+const configStore = useConfigStore();
+const { isFeedbackMandatory } = configStore;
 const showFeedback = computed(() => {
   const hasAgentCommunication = ticket.data?.communications?.some(
     (c) => c.sender !== ticket.data.raised_by
@@ -413,7 +414,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopViewing(props.ticketId);
-  document.title = "Helpdesk";
+  document.title = configStore.productName;
   $socket.off("helpdesk:ticket-update");
 });
 </script>
