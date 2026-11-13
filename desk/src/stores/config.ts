@@ -1,6 +1,7 @@
 import { createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ComputedRef } from "vue";
+import { __ } from "@/translation";
 import { globalStore } from "./globalStore";
 
 export const useConfigStore = defineStore("config", () => {
@@ -12,6 +13,18 @@ export const useConfigStore = defineStore("config", () => {
 
   const config = computed(() => configResource.data || {});
   const brandName = computed(() => config.value.brand_name);
+  // Name shown where the app names itself (header, tab title, welcome text).
+  // `brandName` is the raw HD Settings value, this one falls back to the
+  // product name.
+  const productName = computed(() => brandName.value || __("Ügyfélszolgálat"));
+  // Base URL of our own help pages. Empty (or anything that is not an
+  // http(s) or site-relative URL) means there is no documentation, and the
+  // Help button, the Help panel and every docs link stay hidden.
+  const helpUrl = computed(() => {
+    const url = String(config.value.help_url || "").trim();
+    return /^(https?:\/\/|\/(?!\/))/i.test(url) ? url : "";
+  });
+  const hasHelp = computed(() => !!helpUrl.value);
   const brandLogo = computed(() => config.value.brand_logo);
   const favicon = computed(() => config.value.favicon);
 
@@ -42,6 +55,9 @@ export const useConfigStore = defineStore("config", () => {
   return {
     configResource,
     brandName,
+    productName,
+    helpUrl,
+    hasHelp,
     brandLogo,
     favicon,
     config,

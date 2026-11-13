@@ -7,13 +7,8 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
-        <TrialCard :is-sidebar-collapsed="isCollapsed" />
-        <TrialBanner
-          v-if="isFCSite && !isCustomerPortal && !isCloudSettingsAvailable()"
-          :isSidebarCollapsed="isCollapsed"
-        />
         <GettingStartedBanner
-          v-if="showOnboardingBanner"
+          v-if="showOnboardingBanner && hasHelp"
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
@@ -29,7 +24,7 @@
         </template>
       </div>
       <SidebarItem
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        v-if="hasHelp && isOnboardingStepsCompleted && !isCustomerPortal"
         :label="__('Help')"
         :icon="HelpIcon"
         :on-click="
@@ -45,13 +40,13 @@
   <SettingsModal v-model="showSettingsModal" />
   <ShortcutsModal v-model="showShortcutsModal" />
   <HelpModal
-    v-if="showHelpModal"
+    v-if="hasHelp && showHelpModal"
     v-model="showHelpModal"
     v-model:articles="articles"
     appName="helpdesk"
-    title="Frappe Helpdesk"
+    :title="productName"
     :logo="logo"
-    docsLink="https://docs.frappe.io/helpdesk"
+    :docsLink="helpUrl"
     :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
     :afterSkipAll="() => capture('onboarding_steps_skipped')"
     :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
@@ -65,18 +60,13 @@
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import { InviteCustomer } from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import {
-  confirmLoginToFrappeCloud,
-  isCloudSettingsAvailable,
-} from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
 import { useBanners } from "@/composables/useBanners";
-import { useScreenSize } from "@/composables/screen";
 import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
   showAssignmentModal,
@@ -84,24 +74,22 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
+import { useHelpUrl } from "@/composables/useHelpUrl";
+import { useConfigStore } from "@/stores/config";
+import { getHelpArticles } from "@/data/helpArticles";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
-import {
-  minimize,
-  showHelpModal,
-  TrialBanner,
-  useOnboarding,
-} from "@framework/ui";
+import { minimize, showHelpModal, useOnboarding } from "@framework/ui";
 
 import GettingStartedBanner from "@/components/onboarding/GettingStartedBanner.vue";
 import HelpModal from "@/components/onboarding/HelpModal.vue";
 import IntermediateStepModal from "@/components/onboarding/IntermediateStepModal.vue";
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
-import TrialCard from "./TrialCard.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
@@ -118,15 +106,14 @@ import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
-  openBillingSettings,
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
 
-const { isMobileView } = useScreenSize();
-
 const router = useRouter();
 const authStore = useAuthStore();
+const { helpUrl, hasHelp } = useHelpUrl();
+const { productName } = storeToRefs(useConfigStore());
 const { isVisible: isBannerVisible } = useBanners();
 
 const { appsMenuOption } = useApps();
@@ -137,8 +124,6 @@ const themeMenuItem = computed(() => ({
   icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
   onClick: () => toggleColorScheme(),
 }));
-
-const isFCSite = ref(window.is_fc_site);
 
 const customerPortalDropdown = computed(() => [
   {
@@ -164,18 +149,6 @@ const agentPortalDropdown = computed(() => [
       window.open(path.href);
     },
   },
-  isCloudSettingsAvailable()
-    ? {
-        label: __("Manage billing"),
-        icon: "lucide-credit-card",
-        onClick: openBillingSettings,
-      }
-    : {
-        label: __("Login to Frappe Cloud"),
-        icon: FrappeCloudIcon,
-        onClick: () => confirmLoginToFrappeCloud(),
-        condition: () => !isMobileView.value && window.is_fc_site,
-      },
   {
     label: __("Shortcuts"),
     icon: h(LucideKeyboard),
@@ -330,7 +303,7 @@ const steps = [
       currentStep.value = {
         title: __("Create & invite a contact"),
         buttonLabel: __("Create"),
-        videoURL: "/assets/helpdesk/desk/videos/createInviteContact.mp4",
+        message: __("Create a contact and invite them to the customer portal."),
         onClick: async () => {
           showIntermediateModal.value = false;
           router.push({ name: "ContactList" });
@@ -353,82 +326,8 @@ const steps = [
   },
 ];
 
-const articles = ref([
-  {
-    title: __("Introduction"),
-    opened: false,
-    subArticles: [
-      { name: "introduction", title: __("Introduction") },
-      { name: "setting-up", title: __("Setting up") },
-    ],
-  },
-  {
-    title: __("Getting Started"),
-    opened: false,
-    subArticles: [
-      {
-        name: "lesson-1-your-first-ticket",
-        title: __("Creating a ticket"),
-      },
-      {
-        name: "lesson-2understanding-ticket-view",
-        title: __("Understanding ticket view"),
-      },
-      {
-        name: "lesson-3-agents-teams",
-        title: __("Agents & Teams"),
-      },
-      {
-        name: "customers-contacts",
-        title: __("Customers & Contacts"),
-      },
-      {
-        name: "lesson-4-knowledge-base",
-        title: __("Knowledge Base"),
-      },
-      {
-        name: "customer-portal",
-        title: __("Customer Portal"),
-      },
-    ],
-  },
-  {
-    title: __("Masters"),
-    opened: false,
-    subArticles: [
-      { name: "ticket", title: __("Ticket") },
-      { name: "agent", title: __("Agent") },
-      { name: "team", title: __("Team") },
-      { name: "contact", title: __("Contact") },
-      { name: "customer", title: __("Customer") },
-      { name: "knowledge-base", title: __("Knowledge Base") },
-      { name: "saved-replies", title: __("Saved Replies") },
-      { name: "service-level-agreement", title: __("Service Level Agreement") },
-      { name: "ticket-type", title: __("Ticket Type") },
-      { name: "ticket-priority", title: __("Ticket Priority") },
-    ],
-  },
-  {
-    title: __("Customizations"),
-    opened: false,
-    subArticles: [
-      { name: "custom-actions", title: __("Custom Actions") },
-      { name: "field-dependency", title: __("Field Dependency") },
-      { name: "custom-views", title: __("Custom Views") },
-      {
-        name: "settings",
-        title: __("Settings"),
-      },
-    ],
-  },
-  {
-    title: __("Frappe Helpdesk Mobile"),
-    opened: false,
-    subArticles: [
-      { name: "pwa-installation", title: __("Mobile App Installation") },
-    ],
-  },
-]);
+// Our own articles live in data/helpArticles.ts (empty for now).
+const articles = ref(getHelpArticles());
 
 const showIntermediateModal = ref(false);
 const currentStep = ref({});
@@ -483,6 +382,7 @@ function setUpOnboarding() {
   if (!authStore.isManager) return;
   setUp?.(steps);
   useShortcut({ key: "h", meta: true }, () => {
+    if (!hasHelp.value) return;
     showHelpModal.value = !showHelpModal.value;
   });
 }

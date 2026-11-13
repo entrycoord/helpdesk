@@ -17,7 +17,12 @@
       class="flex justify-between items-center text-base text-ink-gray-5 mx-2"
     >
       <div>{{ __("All articles") }}</div>
-      <Button variant="ghost" :aria-label="__('Open docs')" @click="openDocs">
+      <Button
+        v-if="docsLink"
+        variant="ghost"
+        :aria-label="__('Open docs')"
+        @click="openDocs"
+      >
         <LucideArrowUpRight class="size-4 text-ink-gray-5" />
       </Button>
     </div>
@@ -43,8 +48,11 @@
           <div
             v-for="subArticle in a.subArticles"
             :key="subArticle.name"
-            class="group flex items-center justify-between gap-2 p-1.5 hover:bg-surface-gray-1 rounded-4 cursor-pointer"
-            @click="() => openDoc(subArticle.name)"
+            class="group flex items-center justify-between gap-2 p-1.5 rounded-4"
+            :class="
+              subArticle.url ? 'hover:bg-surface-gray-1 cursor-pointer' : ''
+            "
+            @click="() => openDoc(subArticle)"
           >
             <div class="flex items-center gap-2">
               <LucideFileText class="size-4 text-ink-gray-5" />
@@ -53,6 +61,7 @@
               </div>
             </div>
             <LucideArrowUpRight
+              v-if="subArticle.url"
               class="size-4 hidden group-hover:flex text-ink-gray-5"
             />
           </div>
@@ -70,11 +79,11 @@ import LucideChevronRight from "~icons/lucide/chevron-right";
 import LucideFileText from "~icons/lucide/file-text";
 import LucideSearch from "~icons/lucide/search";
 import { ref, computed, onMounted } from "vue";
-import type { HelpArticle, HelpCenterProps } from "./types";
+import type { HelpArticle, HelpCenterProps, HelpSubArticle } from "./types";
 
-const props = withDefaults(defineProps<HelpCenterProps>(), {
-  docsLink: "https://docs.frappe.io/crm",
-});
+// `docsLink` is the help URL from the config; no default, so nothing can
+// point at an upstream site when it is not set.
+const props = defineProps<HelpCenterProps>();
 
 // `el` is frappe-ui's current TextInput template-ref member. It is being
 // renamed to `inputElement` in frappe-ui 1.0.0 (spec/imperative-api.md), so
@@ -101,11 +110,21 @@ const parsedArticles = computed(() => {
 });
 
 function openDocs() {
-  window.open(props.docsLink, "_blank");
+  if (!props.docsLink) return;
+  window.open(props.docsLink, "_blank", "noopener");
 }
 
-function openDoc(name: string) {
-  window.open(`${props.docsLink}/${name}`, "_blank");
+// An article is a link only when it defines its own `url`: an absolute URL
+// as it is, anything else relative to the help URL.
+function openDoc(article: HelpSubArticle) {
+  if (!article.url) return;
+  const url = /^https?:\/\//i.test(article.url)
+    ? article.url
+    : `${(props.docsLink || "").replace(/\/+$/, "")}/${article.url.replace(
+        /^\/+/,
+        ""
+      )}`;
+  window.open(url, "_blank", "noopener");
 }
 
 onMounted(() => {

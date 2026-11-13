@@ -22,13 +22,13 @@
         >'{{ __("Customer Manager") }}'
       </span>
       {{ __("can see every ticket of their company and manage its contacts.") }}
-      {{ __("Learn more in the") }}
-      <a
-        href="https://docs.frappe.io/helpdesk/customers-contacts#update-on-permissions"
-        target="_blank"
-        class="underline"
-        >{{ __("documentation") }}</a
-      >.
+      <template v-if="helpUrl">
+        {{ __("Learn more in the") }}
+        <a :href="helpUrl" target="_blank" class="underline">{{
+          __("documentation")
+        }}</a
+        >.
+      </template>
     </p>
     <FormControl
       v-model="restoreOldBehaviour"
@@ -43,8 +43,11 @@ import { __ } from "@/translation";
 import { createResource, toast } from "frappe-ui";
 import { ref } from "vue";
 import SidebarBanner from "./SidebarBanner.vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
 
 defineProps<{ isSidebarCollapsed: boolean }>();
+
+const { helpUrl } = useHelpUrl();
 
 const restoreOldBehaviour = ref(false);
 

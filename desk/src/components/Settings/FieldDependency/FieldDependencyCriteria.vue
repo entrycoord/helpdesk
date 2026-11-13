@@ -17,10 +17,7 @@
                 selections.parentField,
               ])
             }}</span>
-            <DocumentationButton
-              url="https://docs.frappe.io/helpdesk/field-dependency#handling-visibility-of-child-field"
-              color="!text-ink-gray-6"
-            />
+            <DocumentationButton color="!text-ink-gray-6" />
           </div>
         </div>
         <MultiSelect
@@ -44,10 +41,7 @@
                 selections.parentField,
               ])
             }}</span>
-            <DocumentationButton
-              url="https://docs.frappe.io/helpdesk/field-dependency#handling-if-the-child-field-is-mandatory"
-              color="!text-ink-gray-6"
-            />
+            <DocumentationButton color="!text-ink-gray-6" />
           </div>
         </div>
         <MultiSelect

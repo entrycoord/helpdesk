@@ -28,12 +28,12 @@
           "If you created custom agent roles, raise their permission level to 8 in Role Permission Manager so they can see agent-only fields."
         )
       }}
-      <a
-        href="https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk"
-        target="_blank"
-        class="underline"
-        >{{ __("See how") }}</a
-      >.
+      <template v-if="helpUrl">
+        <a :href="helpUrl" target="_blank" class="underline">{{
+          __("See how")
+        }}</a
+        >.
+      </template>
     </p>
   </SidebarBanner>
 </template>
@@ -41,6 +41,9 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import SidebarBanner from "./SidebarBanner.vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
 
 defineProps<{ isSidebarCollapsed: boolean }>();
+
+const { helpUrl } = useHelpUrl();
 </script>

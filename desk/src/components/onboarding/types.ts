@@ -61,7 +61,7 @@ export interface UseOnboarding {
 export interface GettingStartedBannerProps {
   /** Render the collapsed, icon-only form used by a collapsed sidebar. */
   isSidebarCollapsed?: boolean;
-  /** App the onboarding status belongs to, e.g. `"frappecrm"`. */
+  /** App the onboarding status belongs to, e.g. `"helpdesk"`. */
   appName?: string;
 }
 
@@ -97,22 +97,33 @@ export interface IntermediateStepModalSlots {
   actions?: () => any;
 }
 
+/** One page inside a help centre group. */
+export interface HelpSubArticle {
+  name: string;
+  title: string;
+  /**
+   * Where the page lives: an absolute http(s) URL, or a path resolved against
+   * the configured help URL. Without it the page is listed but not a link.
+   */
+  url?: string;
+}
+
 /** One article group in the help centre list. */
 export interface HelpArticle {
   /** Group heading. */
   title: string;
   /** Pages inside the group. */
-  subArticles: { name: string; title: string }[];
+  subArticles: HelpSubArticle[];
   /** Whether the group is expanded. */
   opened?: boolean;
 }
 
 /** Props for `<HelpModal>`. */
 export interface HelpModalProps {
-  /** App the onboarding status belongs to, e.g. `"frappecrm"`. */
+  /** App the onboarding status belongs to, e.g. `"helpdesk"`. */
   appName?: string;
   /** Product name shown in the "Welcome to …" heading. */
-  title?: string;
+  title: string;
   /** Logo component shown above the heading. */
   logo: Component;
   /** Run after a single step is skipped. */
@@ -123,14 +134,14 @@ export interface HelpModalProps {
   afterReset?: OnboardingStepCallback | undefined;
   /** Run after every step is reset. */
   afterResetAll?: OnboardingBulkCallback | undefined;
-  /** Base URL articles open against. */
+  /** Configured help URL: "Open docs" opens it, article paths resolve against it. */
   docsLink?: string;
 }
 
 /** Props for `<OnboardingSteps>` — internal to `<HelpModal>`. */
 export interface OnboardingStepsProps {
   appName?: string;
-  title?: string;
+  title: string;
   logo: Component;
   afterSkip?: OnboardingStepCallback | undefined;
   afterSkipAll?: OnboardingBulkCallback | undefined;

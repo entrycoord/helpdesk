@@ -83,8 +83,7 @@ import { useOnboarding, type OnboardingStep } from "@framework/ui";
 import type { OnboardingStepsProps } from "./types";
 
 const props = withDefaults(defineProps<OnboardingStepsProps>(), {
-  appName: "frappecrm",
-  title: "Frappe CRM",
+  appName: "helpdesk",
 });
 
 function isDependent(step: OnboardingStep) {

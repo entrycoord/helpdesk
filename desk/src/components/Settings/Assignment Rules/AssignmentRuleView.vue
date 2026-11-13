@@ -127,8 +127,9 @@
                   )
                 }}
                 <a
+                  v-if="helpUrl"
                   class="font-medium underline"
-                  href="https://docs.frappe.io/helpdesk/assignment-rule"
+                  :href="helpUrl"
                   target="_blank"
                   >{{ __("Learn about conditions") }}</a
                 >
@@ -204,8 +205,9 @@
                   )
                 }}
                 <a
+                  v-if="helpUrl"
                   class="font-medium underline"
-                  href="https://docs.frappe.io/helpdesk/assignment-rule"
+                  :href="helpUrl"
                   target="_blank"
                   >{{ __("Learn about conditions") }}</a
                 >
@@ -343,6 +345,9 @@ import { convertToConditions } from "@/utils";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
+
+const { helpUrl } = useHelpUrl();
 
 const isDirty = ref(false);
 const initialData = ref(null);

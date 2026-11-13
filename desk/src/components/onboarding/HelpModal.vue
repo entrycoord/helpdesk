@@ -47,7 +47,7 @@
       <HelpCenter
         v-else-if="showHelpCenter"
         v-model="articles"
-        :docsLink="docsLink"
+        :docsLink="docsLink ?? ''"
       />
     </div>
     <div v-for="item in footerItems" class="flex flex-col gap-1.5">
@@ -80,9 +80,7 @@ import { computed, watch } from "vue";
 import type { HelpArticle, HelpModalProps } from "./types";
 
 const props = withDefaults(defineProps<HelpModalProps>(), {
-  appName: "frappecrm",
-  title: "Frappe CRM",
-  docsLink: "https://docs.frappe.io/crm",
+  appName: "helpdesk",
 });
 
 const { syncStatus, resetAll, isOnboardingStepsCompleted } = useOnboarding(

@@ -224,19 +224,20 @@
           v-if="settingsData.enableOutsideHoursBanner"
           class="flex gap-x-1 items-start justify-between"
         >
-          <p class="text-sm text-ink-gray-7 leading-5">
+          <p v-if="helpUrl" class="text-sm text-ink-gray-7 leading-5">
             {{
               __(
                 "Find out all of the variables that can be used in the content"
               )
             }}
             <a
-              href="https://docs.frappe.io/helpdesk/helpdesk/customization/outside-working-hours-banner"
+              :href="helpUrl"
               target="_blank"
               class="underline font-semibold"
               >{{ __("here") }}</a
             >
           </p>
+          <span v-else></span>
           <Button
             type="button"
             size="sm"
@@ -273,6 +274,9 @@ import {
   Textarea,
 } from "frappe-ui";
 import { computed, inject } from "vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
+
+const { helpUrl } = useHelpUrl();
 
 const settingsData = inject(HDSettingsSymbol);
 

@@ -67,19 +67,20 @@
               "
             />
             <div class="flex gap-x-1 items-start justify-between">
-              <p class="text-sm text-ink-gray-7 leading-5">
+              <p v-if="helpUrl" class="text-sm text-ink-gray-7 leading-5">
                 {{
                   __(
                     "Find out all of the variables that can be used in the content"
                   )
                 }}
                 <a
-                  :href="props.documentationLink"
+                  :href="helpUrl"
                   target="_blank"
                   class="underline font-semibold"
                   >{{ __("here") }}</a
                 >
               </p>
+              <span v-else></span>
               <Button
                 :disabled="content === defaultContent"
                 type="button"
@@ -136,11 +137,11 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
 
 const props = defineProps<{
   title: string;
   description: string;
-  documentationLink: string;
   defaultContent: string;
   onBack: () => void;
   onSubmit: (e: Event & { target: HTMLFormElement }) => void;
@@ -148,6 +149,8 @@ const props = defineProps<{
   submitting: boolean;
   name: NotificationName;
 }>();
+
+const { helpUrl } = useHelpUrl();
 
 const content = defineModel<string>("content", { required: true });
 const enabled = defineModel<boolean>("enabled", { required: true });

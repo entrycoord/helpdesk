@@ -8,18 +8,22 @@
       </div>
     </template>
     <template #description>
-      <p class="text-p-sm max-w-md text-ink-gray-6">
+      <p v-if="helpUrl" class="text-p-sm max-w-md text-ink-gray-6">
         {{
           __(
             "Create field dependencies to dynamically update options based on user selections. Learn more about field dependencies"
           )
         }}
-        <a
-          href="https://docs.frappe.io/helpdesk/field-dependency"
-          target="_blank"
-          class="underline"
-          >{{ __("here.") }}</a
-        >
+        <a :href="helpUrl" target="_blank" class="underline">{{
+          __("here.")
+        }}</a>
+      </p>
+      <p v-else class="text-p-sm max-w-md text-ink-gray-6">
+        {{
+          __(
+            "Create field dependencies to dynamically update options based on user selections."
+          )
+        }}
       </p>
     </template>
     <template #header-actions>
@@ -151,6 +155,9 @@ import { fieldDependenciesList } from "./fieldDependency";
 import FieldDependencyIcon from "@/components/icons/FieldDependencyIcon.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { useHelpUrl } from "@/composables/useHelpUrl";
+
+const { helpUrl } = useHelpUrl();
 
 onMounted(() => {
   fieldDependenciesList.reload();

@@ -14,16 +14,17 @@
           </div>
           <!-- banner for setting up email account -->
           <div
+            v-if="helpUrl || deskEditUrl"
             class="flex items-center gap-2 rounded-5 p-2 ring-1 ring-outline-elevation-2"
           >
             <CircleAlert
               class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-5"
             />
             <div class="text-wrap text-xs text-ink-gray-7 flex flex-col gap-1">
-              <span>
+              <span v-if="helpUrl">
                 {{ info.description }}
                 <a
-                  :href="info.link"
+                  :href="helpUrl"
                   target="_blank"
                   class="text-ink-blue-5 underline"
                   >{{ __("here") }}</a
@@ -182,6 +183,7 @@ import {
   validateInputs,
 } from "./emailConfig";
 import { __ } from "@/translation";
+import { useHelpUrl } from "@/composables/useHelpUrl";
 
 // emailConfig builds its labels lazily so that `__()` runs after the
 // translation dictionary has loaded
@@ -191,7 +193,10 @@ const customProviderTopFields = computed(() => getCustomProviderTopFields());
 const frappeMailFields = computed(() => getFrappeMailFields());
 const incomingOutgoingFields = computed(() => getIncomingOutgoingFields());
 const popularProviderFields = computed(() => getPopularProviderFields());
-const services = computed(() => getServices());
+// An existing "Frappe Mail" account still has to be editable, so its tile is
+// part of this list although it is no longer offered when adding an account.
+const services = computed(() => getServices({ includeLegacy: true }));
+const { helpUrl } = useHelpUrl();
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface EmailAccountBaseState {
@@ -282,7 +287,6 @@ const customState = reactive<CustomEmailAccountState>(getInitialCustomState());
 
 const info = {
   description: __("To know more about setting up email accounts, click"),
-  link: "https://docs.frappe.io/erpnext/user/manual/en/email-domain",
 };
 
 const deskEditUrl = computed(() => {

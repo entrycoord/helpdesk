@@ -64,7 +64,7 @@ import type { GettingStartedBannerProps } from "./types";
 
 const props = withDefaults(defineProps<GettingStartedBannerProps>(), {
   isSidebarCollapsed: false,
-  appName: "frappecrm",
+  appName: "helpdesk",
 });
 
 // `useOnboarding` returns undefined for guests, and this banner is only

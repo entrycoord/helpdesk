@@ -6,18 +6,22 @@
       </h1>
     </template>
     <template #description>
-      <p class="text-p-sm max-w-md text-ink-gray-6">
+      <p v-if="helpUrl" class="text-p-sm max-w-md text-ink-gray-6">
         {{
           __(
             "SLAs align your team and customers with defined timelines for a reliable experience. Learn more about SLA "
           )
         }}
-        <a
-          href="https://docs.frappe.io/helpdesk/service-level-agreement"
-          target="_blank"
-          class="underline"
+        <a :href="helpUrl" target="_blank" class="underline"
           >{{ __("here.") }}
         </a>
+      </p>
+      <p v-else class="text-p-sm max-w-md text-ink-gray-6">
+        {{
+          __(
+            "SLAs align your team and customers with defined timelines for a reliable experience."
+          )
+        }}
       </p>
     </template>
     <template #header-actions>
@@ -69,6 +73,9 @@ import SlaPolicyList from "./SlaPolicyList.vue";
 import { inject, Ref, watch } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
+import { useHelpUrl } from "@/composables/useHelpUrl";
+
+const { helpUrl } = useHelpUrl();
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 const slaSearchQuery = inject<Ref>("slaSearchQuery");

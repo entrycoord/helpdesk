@@ -20,16 +20,16 @@
       </div>
     </div>
     <div
-      v-if="actions?.length || documentationLink"
+      v-if="actions?.length || docsUrl"
       class="flex flex-wrap items-center justify-center gap-2 pointer-events-auto"
     >
       <Button v-for="action in actions" :key="action.label" v-bind="action" />
       <Button
-        v-if="documentationLink"
+        v-if="docsUrl"
         variant="outline"
         icon-left="lucide-external-link"
         :label="__('Documentation')"
-        :href="documentationLink"
+        :href="docsUrl"
       />
     </div>
   </div>
@@ -75,16 +75,16 @@
         </span>
       </div>
       <div
-        v-if="actions?.length || documentationLink"
+        v-if="actions?.length || docsUrl"
         class="mt-2 flex flex-wrap items-center justify-center gap-2 pointer-events-auto"
       >
         <Button v-for="action in actions" :key="action.label" v-bind="action" />
         <Button
-          v-if="documentationLink"
+          v-if="docsUrl"
           variant="outline"
           icon-left="lucide-external-link"
           :label="__('Documentation')"
-          :href="documentationLink"
+          :href="docsUrl"
         />
       </div>
     </div>
@@ -95,6 +95,7 @@
 import { Button, type ButtonProps } from "frappe-ui";
 import { VNode, computed } from "vue";
 import { __ } from "@/translation";
+import { useHelpUrl } from "@/composables/useHelpUrl";
 interface Props {
   title: string;
   icon?: VNode | string;
@@ -111,6 +112,11 @@ const props = withDefaults(defineProps<Props>(), {
   variant: "default",
   text: "lg",
 });
+
+// `documentationLink` only says that a docs button is wanted here; the button
+// points at the configured help URL and is not rendered without one.
+const { helpUrl } = useHelpUrl();
+const docsUrl = computed(() => (props.documentationLink ? helpUrl.value : ""));
 
 const descriptionText = computed(() =>
   props.description !== undefined && props.description !== ""

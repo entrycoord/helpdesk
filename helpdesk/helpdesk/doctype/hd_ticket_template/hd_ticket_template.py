@@ -14,11 +14,6 @@ from helpdesk.consts import (
 )
 from helpdesk.utils import capture_event
 
-# linked from the hide warning below
-PERMISSION_LEVEL_DOCS = (
-    "https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk"
-)
-
 
 class HDTicketTemplate(Document):
     def validate(self):
@@ -83,22 +78,16 @@ class HDTicketTemplate(Document):
         link = '<a href="/desk/customize-form?doc_type=HD%20Ticket">{0}</a>'.format(
             _("Customize Form")
         )
-        # opens in a new tab so an unsaved template is not lost
-        docs = '<a href="{0}" target="_blank">{1}</a>'.format(
-            PERMISSION_LEVEL_DOCS, _("here")
-        )
         if len(exposed) == 1:
             text = _(
                 "{0} is successfully hidden from customers in the ticket form."
                 " Raise its permission level in {1} to hide it from the API layer."
-                " Read more about permission levels {2}."
-            ).format(exposed[0], link, docs)
+            ).format(exposed[0], link)
         else:
             text = _(
                 "{0} are successfully hidden from customers in the ticket form."
                 " Raise their permission levels in {1} to hide them from the API layer."
-                " Read more about permission levels {2}."
-            ).format(comma_and(exposed, add_quotes=False), link, docs)
+            ).format(comma_and(exposed, add_quotes=False), link)
         frappe.msgprint(
             text, title=_("Ticket form successfully updated"), indicator="blue"
         )
