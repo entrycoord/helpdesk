@@ -65,3 +65,4 @@ helpdesk.patches.harden_hd_ticket_field_permissions
 helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
 helpdesk.patches.add_maintainer_role
+helpdesk.patches.seed_issue_report_defaults

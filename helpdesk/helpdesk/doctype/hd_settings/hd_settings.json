@@ -75,6 +75,7 @@
   "issue_report_team",
   "issue_report_ticket_type",
   "issue_report_priority",
+  "issue_report_grant_customer_role",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -620,12 +621,19 @@
    "fieldtype": "Link",
    "label": "Priority",
    "options": "HD Ticket Priority"
+  },
+  {
+   "fieldname": "issue_report_grant_customer_role",
+   "fieldtype": "Check",
+   "label": "Let reporters open their own tickets",
+   "default": "1",
+   "description": "Gives every user with Desk access the HD Customer role, so a reporter can follow the ticket in the helpdesk portal. New users get it automatically; turning this off does not remove roles already granted."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-13 12:00:00.000000",
+ "modified": "2026-11-13 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

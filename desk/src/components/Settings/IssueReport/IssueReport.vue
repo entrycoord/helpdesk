@@ -116,6 +116,21 @@
             :placeholder="__('Not set')"
           />
         </div>
+
+        <div class="flex flex-col gap-1.5">
+          <Checkbox
+            v-model="form.grantCustomerRole"
+            size="sm"
+            :label="__('Let reporters open their own tickets')"
+          />
+          <p class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Gives every user with Desk access the HD Customer role, so a reporter can follow the ticket in the helpdesk portal. New users get it automatically; turning this off does not remove roles already granted."
+              )
+            }}
+          </p>
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -148,6 +163,7 @@ interface IssueReportForm {
   team: string;
   ticketType: string;
   priority: string;
+  grantCustomerRole: boolean;
 }
 
 const emptyForm = (): IssueReportForm => ({
@@ -159,6 +175,7 @@ const emptyForm = (): IssueReportForm => ({
   team: "",
   ticketType: "",
   priority: "",
+  grantCustomerRole: true,
 });
 
 const form = ref<IssueReportForm>(emptyForm());
@@ -174,6 +191,10 @@ const toForm = (data: Record<string, any>): IssueReportForm => ({
   team: data.issue_report_team || "",
   ticketType: data.issue_report_ticket_type || "",
   priority: data.issue_report_priority || "",
+  grantCustomerRole:
+    data.issue_report_grant_customer_role != null
+      ? Boolean(data.issue_report_grant_customer_role)
+      : true,
 });
 
 function applyData(data: Record<string, any>) {
@@ -202,6 +223,7 @@ const saveResource = createResource({
       issue_report_team: form.value.team,
       issue_report_ticket_type: form.value.ticketType,
       issue_report_priority: form.value.priority,
+      issue_report_grant_customer_role: form.value.grantCustomerRole ? 1 : 0,
     },
   }),
   onSuccess(data: Record<string, any>) {
