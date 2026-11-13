@@ -96,7 +96,11 @@
         <slot name="footer" :is-collapsed="isCollapsed" />
         <SidebarItem
           v-if="!mobile"
-          :label="isCollapsed ? __('Expand sidebar') : __('Collapse sidebar')"
+          :label="
+            isCollapsed
+              ? __('Expand', null, 'sidebar')
+              : __('Collapse', null, 'sidebar')
+          "
           @click="collapsed = !collapsed"
         >
           <template #prefix>

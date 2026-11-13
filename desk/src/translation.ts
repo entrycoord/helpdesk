@@ -9,7 +9,13 @@ const messages = shallowRef<Record<string, string>>(
     {}) as Record<string, string>
 );
 
-function getTranslatedMessage(message: string): string {
+// Same lookup as Frappe's own `__(message, replace, context)`: a contextual row is stored
+// under `message:context`, the plain row under `message`.
+function getTranslatedMessage(message: string, context?: string): string {
+  if (context) {
+    const contextual = messages.value[`${message}:${context}`];
+    if (contextual) return contextual;
+  }
   return messages.value[message] || message;
 }
 
@@ -20,10 +26,24 @@ function translate(message: string, ...args: Replacement[]): string;
 function translate(message: string, args: Replacement[]): string;
 function translate(
   message: string,
-  ...args: (Replacement | Replacement[])[]
+  args: Replacement[] | null | undefined,
+  context: string
+): string;
+function translate(
+  message: string,
+  ...args: (Replacement | Replacement[] | null | undefined)[]
 ): string {
-  const translatedMessage = getTranslatedMessage(message);
-  const values = args.flat();
+  let context: string | undefined;
+  if (
+    args.length === 2 &&
+    (args[0] == null || Array.isArray(args[0])) &&
+    typeof args[1] === "string"
+  ) {
+    context = args[1];
+    args = [args[0]];
+  }
+  const translatedMessage = getTranslatedMessage(message, context);
+  const values = args.flat().filter((v) => v != null) as Replacement[];
   if (values.length === 0) {
     return translatedMessage;
   }
