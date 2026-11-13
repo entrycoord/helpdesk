@@ -26,7 +26,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import SERVER_COMPUTED_FIELDS
+from helpdesk.consts import SERVER_COMPUTED_FIELDS, WELCOME_TICKET_SUBJECTS
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -203,7 +203,7 @@ class HDTicket(Document, CustomerEditController):
             self.send_acknowledgement_email()
 
     def capture_ticket_created_telemetry_events(self):
-        if self.subject == "Welcome to Helpdesk":
+        if self.subject in WELCOME_TICKET_SUBJECTS:
             return
 
         capture_event("ticket_created")

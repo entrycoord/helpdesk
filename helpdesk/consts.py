@@ -47,5 +47,12 @@ CUSTOMER_ALWAYS_WRITABLE_FIELDS = (
 # shown on the agent details tab from meta, whether or not the template lists them
 CORE_TICKET_FIELDS = ("priority", "ticket_type", "customer", "agent_group")
 
+# Subject of the sample ticket created on install. Code that has to skip it
+# (first-ticket onboarding step, telemetry) matches against
+# WELCOME_TICKET_SUBJECTS, so a ticket an earlier version created still counts.
+WELCOME_TICKET_SUBJECT = "Welcome to the support desk"
+LEGACY_WELCOME_TICKET_SUBJECTS = ("Welcome to Helpdesk",)
+WELCOME_TICKET_SUBJECTS = (WELCOME_TICKET_SUBJECT, *LEGACY_WELCOME_TICKET_SUBJECTS)
+
 # maintainers: the outside team that runs the site; private notes on tickets
 MAINTAINER_ROLE = "Helpdesk Maintainer"
