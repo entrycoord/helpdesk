@@ -37,6 +37,8 @@ import SettingsGear from "~icons/lucide/settings";
 import ZapIcon from "~icons/lucide/zap";
 import ProfilePage from "./Profile/ProfilePage.vue";
 import Preferences from "./Preferences/Preferences.vue";
+import IssueReport from "./IssueReport/IssueReport.vue";
+import LucideMessageSquareWarning from "~icons/lucide/message-square-warning";
 
 export const showSettingsModal = ref(false);
 
@@ -137,6 +139,14 @@ export const tabs = computed(() => {
           icon: markRaw(ZapIcon),
           component: markRaw(SavedReplies),
         },
+        {
+          label: __("Issue reporting"),
+          icon: markRaw(LucideMessageSquareWarning),
+          component: markRaw(IssueReport),
+          // HD Settings.before_save needs System Manager (permission_manager.remove),
+          // so Agent Manager can read but never save these fields
+          condition: () => auth.isAdmin,
+        },
       ],
     },
     {
@@ -190,7 +200,8 @@ type TabName =
   | "Field Dependencies"
   | "Telephony"
   | "ERPNext"
-  | "Saved Replies";
+  | "Saved Replies"
+  | "Issue reporting";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =
