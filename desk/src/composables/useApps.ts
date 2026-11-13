@@ -3,26 +3,9 @@ import { computed, h, markRaw, type Component, type ComputedRef } from "vue";
 import AppsIcon from "@/components/icons/AppsIcon.vue";
 import { __ } from "@/translation";
 import { isCustomerPortal } from "@/utils";
+import { buildApps, type App } from "./appsList";
 
-export interface App {
-  name: string;
-  logo: string;
-  title: string;
-  route: string;
-}
-
-const deskApp: App = {
-  name: "frappe",
-  logo: "/assets/helpdesk/desk/desk.png",
-  title: "System",
-  route: "/desk/helpdesk",
-};
-
-// Product names we show instead of the upstream app titles.
-const APP_TITLES: Record<string, string> = {
-  erpnext: "ERP",
-  crm: "CRM",
-};
+export type { App };
 
 interface AppsMenuOption {
   label: string;
@@ -31,8 +14,11 @@ interface AppsMenuOption {
 }
 
 /**
- * Fetches the Frappe apps the user can switch to (Desk, ERPNext, CRM, ...) and
+ * Fetches the Frappe apps the user can switch to (ERP, CRM, ..., Rendszer) and
  * exposes them as a native Dropdown submenu option that opens on hover.
+ *
+ * Titles, logos and the `frappe` ("Rendszer", route `/desk`) entry come from
+ * `frappe.apps.get_apps`; `buildApps` only orders them and fills the gaps.
  *
  * Mirrors the apps switcher in frappe/builder (`DashboardSidebar.vue`): plain
  * `label`/`icon`/`onClick` items so reka's submenu hover-intent works cleanly.
@@ -44,19 +30,7 @@ export function useApps() {
     // customers lack permission for get_apps (403); sidebar remounts on portal
     // switch, so this re-evaluates for agents
     auto: !isCustomerPortal.value,
-    transform: (data: App[]) => {
-      const apps = [deskApp];
-      data.forEach((app) => {
-        if (app.name === "helpdesk") return;
-        apps.push({
-          name: app.name,
-          logo: app.logo,
-          title: APP_TITLES[app.name] || app.title,
-          route: app.route,
-        });
-      });
-      return apps;
-    },
+    transform: (data: App[]) => buildApps(data, __("System")),
   });
 
   const apps = computed<App[]>(() => resource.data ?? []);
@@ -65,7 +39,7 @@ export function useApps() {
     label: __("Apps"),
     icon: markRaw(AppsIcon),
     submenu: apps.value.map((app) => ({
-      label: app.name === deskApp.name ? __(app.title) : app.title,
+      label: app.title,
       icon: h("img", { src: app.logo }),
       onClick: () => window.open(app.route, "_self"),
     })),
