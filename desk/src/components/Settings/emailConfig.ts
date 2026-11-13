@@ -80,7 +80,7 @@ export const getFrappeMailFields = () => [
     label: __("Frappe Mail site"),
     name: "frappe_mail_site",
     type: "text",
-    placeholder: "https://frappemail.com",
+    placeholder: "https://mail.example.com",
   },
   {
     label: __("API Key"),
@@ -168,7 +168,22 @@ export const getCustomOutgoingFields = () => [
 
 export const getCustomProviderFields = getCustomProviderTopFields;
 
-export const getServices = (): EmailService[] => [
+/**
+ * Providers offered when adding an email account. "Frappe Mail" is stored as
+ * the account's `service`, so it cannot disappear from the data; it is only
+ * left out of the picker. `includeLegacy` brings it back for editing an
+ * account that already uses it.
+ */
+export const getServices = ({
+  includeLegacy = false,
+}: { includeLegacy?: boolean } = {}): EmailService[] =>
+  getAllServices().filter(
+    (service) => includeLegacy || !LEGACY_SERVICES.includes(service.name)
+  );
+
+const LEGACY_SERVICES: string[] = ["Frappe Mail"];
+
+const getAllServices = (): EmailService[] => [
   {
     name: "GMail",
     icon: LogoGmail,
@@ -235,7 +250,7 @@ export const getServices = (): EmailService[] => [
     info: __(
       "Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more"
     ),
-    link: "https://github.com/frappe/mail",
+    link: "",
     custom: true,
   },
   {

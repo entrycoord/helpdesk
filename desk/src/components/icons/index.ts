@@ -15,7 +15,6 @@ export { default as ErpnextIcon } from "./ErpnextIcon.vue";
 export { default as ERPNextSettingsIcon } from "./ERPNextSettingsIcon.vue";
 export { default as ExternalLinkIcon } from "./ExternalLinkIcon.vue";
 export { default as FieldDependencyIcon } from "./FieldDependencyIcon.vue";
-export { default as FrappeCloudIcon } from "./FrappeCloudIcon.vue";
 export { default as GlobeIcon } from "./GlobeIcon.vue";
 export { default as IndicatorIcon } from "./IndicatorIcon.vue";
 export { default as InviteCustomer } from "./InviteCustomer.vue";

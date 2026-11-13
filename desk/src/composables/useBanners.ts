@@ -1,12 +1,10 @@
 import { globalStore } from "@/stores/globalStore";
-import type { BillingTrial } from "@frappe/cloud-sdk";
 import { createResource } from "frappe-ui";
 
 export type BannerName =
   | "customer_portal_permission"
-  | "ticket_field_permission"
-  | "trial";
-export type Banner = { name: BannerName; trial?: BillingTrial };
+  | "ticket_field_permission";
+export type Banner = { name: BannerName };
 
 const banners = createResource({
   url: "helpdesk.api.banners.get_banners",
@@ -14,9 +12,6 @@ const banners = createResource({
 });
 const dismissResource = createResource({
   url: "helpdesk.api.banners.dismiss_banner",
-});
-const refreshTrialResource = createResource({
-  url: "helpdesk.api.banners.refresh_trial",
 });
 let started = false;
 
@@ -42,11 +37,5 @@ export function useBanners() {
     banners.reload();
   }
 
-  // The server caches the trial, so ask it to read Frappe Cloud again first
-  async function refreshTrial(): Promise<void> {
-    await refreshTrialResource.submit();
-    banners.reload();
-  }
-
-  return { banner, isVisible, dismiss, refreshTrial };
+  return { banner, isVisible, dismiss };
 }

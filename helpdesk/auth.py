@@ -43,7 +43,6 @@ ALLOWED_PATHS = [
     "/api/method/frappe.website.doctype.web_form.web_form.accept",
     "/api/method/frappe.core.doctype.user.user.test_password_strength",
     "/api/method/frappe.core.doctype.user.user.update_password",
-    "/api/method/frappe.utils.telemetry.pulse.client.is_enabled",
     "/api/method/frappe.client.get_value",
     "/api/method/frappe.client.get_count",
     "/api/method/frappe.client.get",

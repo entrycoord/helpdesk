@@ -413,7 +413,6 @@ export interface Breadcrumb {
   };
 }
 
-
 export interface FieldCriteriaState {
   selectedParentField: string;
   selectedChildField: string;
@@ -693,7 +692,6 @@ export const CustomerResourceSymbol: InjectionKey<
 
 declare global {
   interface Window {
-    is_fc_site: boolean;
     date_format: string;
     time_format: string;
     session_user: string;
@@ -701,7 +699,6 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
-    cloud_settings?: { enabled: boolean };
   }
 }
 

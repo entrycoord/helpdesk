@@ -11,7 +11,6 @@ from frappe.query_builder import Order
 from frappe.realtime import get_website_room
 from frappe.utils import floor
 from frappe.utils.safe_exec import get_safe_globals
-from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
 from pypika.functions import Replace
@@ -95,8 +94,12 @@ def get_doc_room(doctype: str, name: str) -> str:
     return f"open_doc:{doctype}/{name}"
 
 
-def capture_event(event: str):
-    return _capture(event, "helpdesk")
+def capture_event(event: str) -> None:
+    """Product telemetry is switched off in this fork: nothing leaves the site.
+
+    The call sites stay, so an event can be logged locally here later.
+    """
+    return None
 
 
 def get_customers(user: str = "", contact: str = "", get_roles=False):

@@ -1,7 +1,7 @@
 <template>
   <Dialog
     :open="show"
-    @update:open="(open) => (open || !isCloudOverlayOpen()) && (show = open)"
+    @update:open="(open) => (show = open)"
     size="5xl"
     bare
     :dismissible="!disableSettingModalOutsideClick"
@@ -107,12 +107,10 @@ import {
 } from "./settingsModal";
 
 const show: ModelRef<boolean> = defineModel();
-const isCloudOverlayOpen = () =>
-  !!document.querySelector("fc-cloud-settings[overlay-open]");
 
 const showConfirmDialog = ref(false);
 
-// runs once per open: opened on a low tab (e.g. Billing), show its whole group
+// runs once per open: opened on a low tab (e.g. Telephony), show its whole group
 function revealActiveGroup(nav) {
   nav
     ?.querySelector("[aria-current=page]")
