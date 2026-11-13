@@ -65,6 +65,16 @@
   "show_customer_portal_permission_notice",
   "show_ticket_field_permission_notice",
   "column_break_hjfh",
+  "issue_report_tab",
+  "issue_report_enabled",
+  "issue_report_button_label",
+  "issue_report_in_desk",
+  "issue_report_in_crm",
+  "column_break_issue_report",
+  "issue_report_template",
+  "issue_report_team",
+  "issue_report_ticket_type",
+  "issue_report_priority",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -515,7 +525,7 @@
    "fieldname": "disable_saved_replies_global_scope",
    "fieldtype": "Check",
    "label": "Disable saved replies with scope 'Global'"
-     },
+  },
   {
    "fieldname": "section_break_ylvs",
    "fieldtype": "Section Break"
@@ -524,8 +534,8 @@
    "fieldname": "column_break_fzef",
    "fieldtype": "Column Break"
   },
-{
-   "default": "Thanks for reaching out \ud83d\udc4b. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}.",
+  {
+   "default": "Thanks for reaching out 👋. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}.",
    "depends_on": "enable_outside_hours_banner",
    "fieldname": "outside_working_hours_message",
    "fieldtype": "Small Text",
@@ -551,12 +561,71 @@
    "fieldname": "auto_set_customer_from_contact",
    "fieldtype": "Check",
    "label": "Auto-set customer from contact"
+  },
+  {
+   "fieldname": "issue_report_tab",
+   "fieldtype": "Tab Break",
+   "label": "Issue reporting"
+  },
+  {
+   "fieldname": "issue_report_enabled",
+   "fieldtype": "Check",
+   "label": "Enable issue reporting button",
+   "default": "0",
+   "description": "Shows a Report an issue button in the sidebar of the selected apps. Anyone with Desk access can report."
+  },
+  {
+   "fieldname": "issue_report_button_label",
+   "fieldtype": "Data",
+   "label": "Button label",
+   "description": "Leave empty for the translated default (Report an issue)."
+  },
+  {
+   "fieldname": "issue_report_in_desk",
+   "fieldtype": "Check",
+   "label": "Show in Desk (framework, ERP)",
+   "default": "1"
+  },
+  {
+   "fieldname": "issue_report_in_crm",
+   "fieldtype": "Check",
+   "label": "Show in CRM",
+   "default": "1"
+  },
+  {
+   "fieldname": "column_break_issue_report",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issue_report_template",
+   "fieldtype": "Link",
+   "label": "Form template",
+   "options": "HD Ticket Template",
+   "description": "Fields and description template of the report form. Empty = subject, description, attachments."
+  },
+  {
+   "fieldname": "issue_report_team",
+   "fieldtype": "Link",
+   "label": "Team",
+   "options": "HD Team"
+  },
+  {
+   "fieldname": "issue_report_ticket_type",
+   "fieldtype": "Link",
+   "label": "Ticket type",
+   "options": "HD Ticket Type"
+  },
+  {
+   "fieldname": "issue_report_priority",
+   "fieldtype": "Link",
+   "label": "Priority",
+   "options": "HD Ticket Priority"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-02 15:54:13.209685",
+ "modified": "2026-11-13 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
